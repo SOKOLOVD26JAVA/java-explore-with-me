@@ -5,6 +5,7 @@ services:
     container_name: explore-with-me-server
     ports:
       - "9090:8080"
+
     depends_on:
       - stats-db
     environment:
