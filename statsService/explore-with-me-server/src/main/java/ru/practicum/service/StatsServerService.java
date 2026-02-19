@@ -8,6 +8,7 @@ import ru.practicum.mapper.HitMapper;
 import ru.practicum.repository.StatsServerRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,11 +23,7 @@ public class StatsServerService {
 
     public List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (uris == null || uris.isEmpty()) {
-            if (unique) {
-                return repository.getWithOutUriUniqueStats(start, end);
-            } else {
-                return repository.getWithOutUriAllStats(start, end);
-            }
+            return new ArrayList<>();
         } else {
             if (unique) {
                 return repository.getWithUriUniqueStats(start, end, uris);

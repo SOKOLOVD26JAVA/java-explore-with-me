@@ -25,8 +25,10 @@ public class HitServerHttpClientImpl implements HitServerHttpClient {
 
     private final RestTemplate restTemplate;
 
+    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @Value("${explore.server.url}")
-    String serverUrl;
+    private String serverUrl;
 
     public HitDto saveHit(String app, String uri, String ip, LocalDateTime timestamp) {
         HitDto hitDto = new HitDto();
@@ -50,10 +52,10 @@ public class HitServerHttpClientImpl implements HitServerHttpClient {
 
     public List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         String encodedStart = URLEncoder.encode(
-                start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                start.format(FORMATTER),
                 StandardCharsets.UTF_8);
         String encodedEnd = URLEncoder.encode(
-                end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                end.format(FORMATTER),
                 StandardCharsets.UTF_8);
 
         StringBuilder uriBuilder = new StringBuilder(serverUrl + "/stats?");
