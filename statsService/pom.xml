@@ -11,9 +11,9 @@
 
 	<name>Explore With Me Stats</name>
 	<modules>
-		<module>explore-with-me-client</module>
-		<module>explore-with-me-server</module>
-		<module>explore-with-me-dto</module>
+		<module>client</module>
+		<module>server</module>
+		<module>dto</module>
 	</modules>
 
 	<groupId>ru.practicum</groupId>
