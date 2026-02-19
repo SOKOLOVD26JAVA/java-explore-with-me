@@ -23,7 +23,11 @@ public class StatsServerService {
 
     public List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (uris == null || uris.isEmpty()) {
-            return new ArrayList<>();
+            if (unique) {
+                return repository.getWithOutUriUniqueStats(start, end);
+            } else {
+                return repository.getWithOutUriAllStats(start, end);
+            }
         } else {
             if (unique) {
                 return repository.getWithUriUniqueStats(start, end, uris);
