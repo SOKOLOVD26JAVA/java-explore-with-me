@@ -1,6 +1,6 @@
 services:
   stats-server:
-    build: explore-with-me-server
+    build: ./statsService/server
     image: explore-with-me-server
     container_name: explore-with-me-server
     ports:
