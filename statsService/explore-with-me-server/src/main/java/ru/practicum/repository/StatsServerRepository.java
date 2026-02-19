@@ -18,6 +18,7 @@ public interface StatsServerRepository extends JpaRepository<Hit, Long> {
             "WHERE h.timestamp BETWEEN :start AND :end AND h.uri IN :uris " +
             "GROUP BY h.app, h.uri " +
             "ORDER BY COUNT(DISTINCT(h.ip)) DESC")
+
     List<HitResponseDto> getWithUriUniqueStats(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
                                                @Param("uris") List<String> uris);
 
