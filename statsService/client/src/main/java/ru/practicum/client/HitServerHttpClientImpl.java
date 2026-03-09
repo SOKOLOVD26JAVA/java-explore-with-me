@@ -20,15 +20,20 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class HitServerHttpClientImpl implements HitServerHttpClient {
 
     private final RestTemplate restTemplate;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter;
 
     @Value("${explore.server.url}")
-    private String serverUrl;
+    private final String serverUrl;
+
+    public HitServerHttpClientImpl(@Value("${explore.server.url}") String serverUrl) {
+        this.restTemplate = new RestTemplate();
+        this.formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.serverUrl = serverUrl;
+    }
 
     public HitDto saveHit(String app, String uri, String ip, LocalDateTime timestamp) {
         HitDto hitDto = new HitDto();

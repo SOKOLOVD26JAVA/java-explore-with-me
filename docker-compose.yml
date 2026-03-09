@@ -26,3 +26,30 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  main-server:
+    build: ./mainService/service
+    image: explore-with-me-main-service
+    container_name: explore-with-me-main-service
+    ports:
+      - "9091:9091"
+    depends_on:
+      - main-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-service-db
+      - SPRING_DATASOURCE_USERNAME=explore
+      - SPRING_DATASOURCE_PASSWORD=explore
+  main-db:
+    image: postgres:16.1
+    container_name: main-service-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=explore
+      - POSTGRES_USER=explore
+      - POSTGRES_DB=main-service-db
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10

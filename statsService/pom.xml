@@ -13,7 +13,7 @@
 	<modules>
 		<module>client</module>
 		<module>server</module>
-		<module>dto</module>
+		<module>stats-service-dto</module>
 	</modules>
 
 	<groupId>ru.practicum</groupId>

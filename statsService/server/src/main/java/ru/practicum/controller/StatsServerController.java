@@ -18,7 +18,6 @@ public class StatsServerController {
 
     @PostMapping("/hit")
     public HitDto saveHit(@RequestBody HitDto hitDto) {
-        System.out.println(hitDto);
         return service.saveHit(hitDto);
     }
 
