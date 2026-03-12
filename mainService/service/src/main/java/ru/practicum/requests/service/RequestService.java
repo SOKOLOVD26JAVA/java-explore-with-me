@@ -23,6 +23,7 @@ import ru.practicum.users.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +37,7 @@ public class RequestService {
     public List<ParticipantRequestDto> getUserRequests(Long userId, Long eventId) {
         User user = getUserById(userId);
         Event event = getEventById(eventId);
-        if (event.getInitiator().getId() != user.getId()) {
+        if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new AccessException("You have no access for this operation.");
         }
 
@@ -97,7 +98,7 @@ public class RequestService {
     public ParticipantRequestDto createRequestEvent(Long userId, Long eventId) {
         Event event = getEventById(eventId);
         User user = getUserById(userId);
-        if (event.getInitiator().getId() == userId) {
+        if (Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ConflictException("Initiator cant create request.");
         }
         if (event.getState() != State.PUBLISHED) {

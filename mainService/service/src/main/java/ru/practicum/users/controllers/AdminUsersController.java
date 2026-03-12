@@ -32,7 +32,7 @@ public class AdminUsersController {
                                   @RequestParam(required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
-        if (ids == null && ids.isEmpty()) {
+        if (ids == null || ids.isEmpty()) {
             return usersService.findAll(adminId, from, size);
         } else {
             return usersService.findByIds(adminId, ids);
