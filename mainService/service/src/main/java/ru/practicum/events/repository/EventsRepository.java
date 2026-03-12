@@ -4,8 +4,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventWithConfirmed;
 import ru.practicum.eventsDto.State;

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/events")
 @RequiredArgsConstructor
 public class AdminEventController {
 
@@ -24,17 +24,17 @@ public class AdminEventController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> getAllEvents(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                           @RequestParam(required = false) List<Long> ids,
+                                           @RequestParam(required = false) List<Long> users,
                                            @RequestParam(required = false) List<State> states,
                                            @RequestParam(required = false) List<Long> categories,
                                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rageEnd,
                                            @RequestParam(defaultValue = "0") int from,
                                            @RequestParam(defaultValue = "10") int size) {
-        return eventService.getAllEventsAdmin(adminId, ids, states, categories, rangeStart, rageEnd, from, size);
+        return eventService.getAllEventsAdmin(adminId, users, states, categories, rangeStart, rageEnd, from, size);
     }
 
-    @PatchMapping
+    @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto updateEventByAdmin(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
                                            @PathVariable Long eventId,

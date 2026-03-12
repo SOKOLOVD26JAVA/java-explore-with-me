@@ -53,3 +53,15 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  gateway:
+    build: ./mainService/gateway
+    image: explore-with-me-gateway
+    container_name: explore-with-me-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - main-server
+      - stats-server
+    environment:
+      - EXPLORE_MAIN_SERVER_URL=http://main-server:9091

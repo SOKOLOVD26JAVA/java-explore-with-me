@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.eventsDto.State;

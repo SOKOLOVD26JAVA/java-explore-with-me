@@ -3,7 +3,7 @@ package ru.practicum.compilations.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import ru.practicum.compilations.mapper.CompilationsMapper;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationsRepository;

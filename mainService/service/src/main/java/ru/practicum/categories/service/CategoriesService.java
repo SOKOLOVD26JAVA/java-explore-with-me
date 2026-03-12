@@ -66,7 +66,7 @@ public class CategoriesService {
     }
 
     public CategoryDto getCategoryById(Long categoryId) {
-        return CategoriesMapper.mapToCategoryDto(categoriesRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Category with ID = " + categoryId+ ", not found.")));
+        return CategoriesMapper.mapToCategoryDto(categoriesRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Category with ID = " + categoryId + ", not found.")));
     }
 
     private void adminCheck(Long adminId) {

@@ -1,5 +1,6 @@
 package ru.practicum.events.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -21,21 +22,23 @@ public class PublicEventController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEvents(@RequestParam(required = false) String text,
-                                         @RequestParam(required = false) List<Long> catIds,
+                                         @RequestParam(required = false) List<Long> categories,
                                          @RequestParam(required = false) Boolean paid,
                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rageEnd,
                                          @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                          @RequestParam(required = false) String sort,
                                          @RequestParam(defaultValue = "0") int from,
-                                         @RequestParam(defaultValue = "10") int size
+                                         @RequestParam(defaultValue = "10") int size,
+                                         HttpServletRequest request
     ) {
-        return eventService.getEvents(text, catIds, paid, rangeStart, rageEnd, onlyAvailable, sort, from, size);
+        return eventService.getEvents(text, categories, paid, rangeStart, rageEnd, onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EventFullDto getEventById(@PathVariable Long id) {
-        return eventService.getEvent(id);
+    public EventFullDto getEventById(@PathVariable Long id,
+                                     HttpServletRequest request) {
+        return eventService.getEvent(id, request);
     }
 }

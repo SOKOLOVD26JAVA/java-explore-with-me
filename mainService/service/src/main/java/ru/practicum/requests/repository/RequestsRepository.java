@@ -28,5 +28,4 @@ public interface RequestsRepository extends JpaRepository<Request, Long> {
     List<Request> findAllByRequesterId(Long requesterId);
 
 
-
 }

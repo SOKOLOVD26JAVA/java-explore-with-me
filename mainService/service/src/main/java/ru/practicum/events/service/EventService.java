@@ -1,14 +1,15 @@
 package ru.practicum.events.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
-import ru.practicum.client.HitServerHttpClient;
+
 import ru.practicum.client.HitServerHttpClientImpl;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
@@ -117,11 +118,12 @@ public class EventService {
         }).collect(Collectors.toList());
     }
 
-    public EventFullDto getEvent(Long eventId) {
+    public EventFullDto getEvent(Long eventId, HttpServletRequest request) {
         Event event = getEventById(eventId);
         if (event.getState() != State.PUBLISHED) {
             throw new NotFoundException("Event with ID = " + eventId + ", not found.");
         }
+        serverHttpClient.saveHit("ewm-main-service", "/events/" + eventId, request.getRemoteAddr(), LocalDateTime.now());
         return EventMapper.mapToFullEventDto(event, getViews(event), requestsRepository.getConfirmedRequestsCount(eventId));
     }
 
@@ -133,7 +135,8 @@ public class EventService {
                                          Boolean onlyAvailable,
                                          String sort,
                                          int from,
-                                         int size
+                                         int size,
+                                         HttpServletRequest request
     ) {
         if (rangeStart == null && rageEnd == null) {
             rangeStart = LocalDateTime.now();
@@ -147,6 +150,12 @@ public class EventService {
             dto.setViews(getViews(row.getEvent()));
             return dto;
         }).toList();
+
+        serverHttpClient.saveHit("ewm-main-service", "/events/", request.getRemoteAddr(), LocalDateTime.now());
+
+        if (sort == null) {
+            return shortDtoEvents;
+        }
         return switch (sort) {
             case "EVENT_DATE" ->
                     shortDtoEvents.stream().sorted(Comparator.comparing(EventShortDto::getEventDate).reversed()).collect(Collectors.toList());

@@ -49,7 +49,7 @@ public class RegisteredEventsRequestController {
     @ResponseStatus(HttpStatus.OK)
     public ParticipantRequestDto cancelRequest(@PathVariable Long userId,
                                                @PathVariable Long requestId) {
-        return requestService.cancelRequest(userId,requestId);
+        return requestService.cancelRequest(userId, requestId);
     }
 
 }
