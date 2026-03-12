@@ -6,6 +6,7 @@ import ru.practicum.categoryDto.CategoryDto;
 import ru.practicum.usersDto.UserShortDto;
 
 import java.time.LocalDateTime;
+
 @Data
 public class EventFullDto {
     private Long id;

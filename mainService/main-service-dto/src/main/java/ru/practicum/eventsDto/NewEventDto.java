@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.Data;
 import ru.practicum.LocationDto;
-import ru.practicum.categoryDto.CategoryDto;
 
 import java.time.LocalDateTime;
+
 @Data
 public class NewEventDto {
     @NotBlank(message = "Field: annotation. Error: must not be blank. Value: null")

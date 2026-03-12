@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
+
 @Data
 public class EventRequestStatusUpdateRequest {
     @NotNull(message = "Field: requests. Error: must not be null. Value: null")

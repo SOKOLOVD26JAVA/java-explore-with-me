@@ -4,6 +4,7 @@ import lombok.Data;
 import ru.practicum.eventsDto.EventShortDto;
 
 import java.util.List;
+
 @Data
 public class CompilationDto {
     private Long id;
