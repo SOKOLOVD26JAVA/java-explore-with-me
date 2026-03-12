@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> HttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+    public ResponseEntity<ErrorResponse> httpMessageNotReadableException(HttpMessageNotReadableException exception) {
         ErrorResponse error = ErrorResponse.builder()
                 .status("BAD_REQUEST")
                 .reason("Incorrectly made request.")
