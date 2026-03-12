@@ -27,7 +27,7 @@ services:
       interval: 5s
       retries: 10
 
-  main-server:
+  ewm-service:
     build: ./mainService/service
     image: explore-with-me-main-service
     container_name: explore-with-me-main-service
@@ -61,7 +61,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - main-server
+      - ewm-service
       - stats-server
     environment:
       - EXPLORE_MAIN_SERVER_URL=http://main-server:9091
