@@ -3,7 +3,6 @@ package ru.practicum.categories.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.Headers;
 import ru.practicum.categories.service.CategoriesService;
 import ru.practicum.categoryDto.CategoryDto;
 import ru.practicum.categoryDto.NewCategoryDto;
