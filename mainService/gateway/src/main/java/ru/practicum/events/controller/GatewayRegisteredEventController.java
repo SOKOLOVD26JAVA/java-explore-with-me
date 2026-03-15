@@ -19,10 +19,10 @@ public class GatewayRegisteredEventController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{userId}/events")
-    public List<EventShortDto> getUserEvents(@PathVariable Long userID,
+    public List<EventShortDto> getUserEvents(@PathVariable Long userId,
                                              @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "10") int size) {
-        return client.getUserEvents(userID, from, size);
+        return client.getUserEvents(userId, from, size);
     }
 
     @ResponseStatus(HttpStatus.CREATED)

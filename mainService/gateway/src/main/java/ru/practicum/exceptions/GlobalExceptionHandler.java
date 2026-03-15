@@ -2,18 +2,19 @@ package ru.practicum.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 
 import java.time.LocalDateTime;
 
-@RestControllerAdvice
+@Slf4j
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
                 .status("BAD_REQUEST")
                 .reason("Incorrectly made request.")
                 .message(exception.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now().toString())
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -37,11 +38,12 @@ public class GlobalExceptionHandler {
                 .status("BAD_REQUEST")
                 .reason("Incorrectly made request.")
                 .message("incorrect date format.")
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime.now().toString())
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
 
     @ExceptionHandler(GatewayException.class)
     public ResponseEntity<ErrorResponse> gatewayException(GatewayException e) throws JsonProcessingException {

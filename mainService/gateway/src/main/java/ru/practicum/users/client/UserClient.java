@@ -5,12 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
 import ru.practicum.exceptions.GatewayException;
-
 import ru.practicum.usersDto.NewUserDto;
 import ru.practicum.usersDto.UserDto;
 
@@ -26,10 +23,9 @@ public class UserClient {
     @Value("${explore.main.server.url}")
     private String serverUrl;
 
-    public UserDto createUser(Long adminId,
-                              NewUserDto newUserDto) {
+    public UserDto createUser(NewUserDto newUserDto) {
         String uri = createUrl("/admin/users");
-        HttpEntity<NewUserDto> request = new HttpEntity<>(newUserDto, createHeadersWithUserId(adminId));
+        HttpEntity<NewUserDto> request = new HttpEntity<>(newUserDto);
         try {
             ResponseEntity<UserDto> response = restTemplate
                     .exchange(uri, HttpMethod.POST, request, UserDto.class);
@@ -39,18 +35,17 @@ public class UserClient {
         }
     }
 
-    public void deleteUser(Long adminId, Long userId) {
+    public void deleteUser(Long userId) {
         String url = createUrl("/admin/users/" + userId);
-        HttpEntity<?> request = new HttpEntity<>(createHeadersWithUserId(adminId));
+
         try {
-            restTemplate.exchange(url, HttpMethod.DELETE, request, Void.class);
+            restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
         } catch (HttpStatusCodeException e) {
             throw new GatewayException((HttpStatus) e.getStatusCode(), e.getResponseBodyAsString());
         }
     }
 
-    public List<UserDto> getUsers(Long adminId,
-                                  List<Long> ids,
+    public List<UserDto> getUsers(List<Long> ids,
                                   int from,
                                   int size) {
         String baseUri = "/admin/users";
@@ -67,10 +62,10 @@ public class UserClient {
         }
 
         String fullUri = createUrl(uri.toString());
-        HttpEntity<?> request = new HttpEntity<>(createHeadersWithUserId(adminId));
+
         try {
             ResponseEntity<List<UserDto>> response = restTemplate
-                    .exchange(fullUri, HttpMethod.GET, request, new ParameterizedTypeReference<List<UserDto>>() {
+                    .exchange(fullUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<UserDto>>() {
                     });
             return response.getBody();
         } catch (HttpStatusCodeException e) {

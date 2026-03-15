@@ -24,9 +24,7 @@ public class CategoriesService {
     private final CategoriesRepository categoriesRepository;
     private final UserRepository userRepository;
 
-    public CategoryDto createCategory(Long adminId, NewCategoryDto categoryDto) {
-
-        adminCheck(adminId);
+    public CategoryDto createCategory(NewCategoryDto categoryDto) {
         try {
             return CategoriesMapper.mapToCategoryDto(categoriesRepository.save(CategoriesMapper.mapToCategory(categoryDto)));
         } catch (DataIntegrityViolationException e) {
@@ -34,11 +32,9 @@ public class CategoriesService {
         }
     }
 
-    public void deleteCategoryById(Long adminId, Long categoryId) {
+    public void deleteCategoryById(Long categoryId) {
 
-        adminCheck(adminId);
-
-        Category category = categoriesRepository.findById(adminId)
+        Category category = categoriesRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with ID = " + categoryId + ", not found."));
 
         try {
@@ -48,8 +44,8 @@ public class CategoriesService {
         }
     }
 
-    public CategoryDto updateCategory(Long adminId, Long categoryId, NewCategoryDto categoryDto) {
-        adminCheck(adminId);
+    public CategoryDto updateCategory(Long categoryId, NewCategoryDto categoryDto) {
+
         Category category = categoriesRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with ID = " + categoryId + ", not found."));
 

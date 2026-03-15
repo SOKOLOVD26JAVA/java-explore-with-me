@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.Headers;
 import ru.practicum.users.client.UserClient;
 import ru.practicum.usersDto.NewUserDto;
 import ru.practicum.usersDto.UserDto;
@@ -21,25 +20,23 @@ public class GatewayAdminUsersController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public UserDto createUser(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                              @Valid @RequestBody NewUserDto newUserDto) {
+    public UserDto createUser(@Valid @RequestBody NewUserDto newUserDto) {
 
-        return client.createUser(adminId, newUserDto);
+        return client.createUser(newUserDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<UserDto> getUsers(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                  @RequestParam(required = false) List<Long> ids,
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
-        return client.getUsers(adminId, ids, from, size);
+        return client.getUsers(ids, from, size);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
-    public void deleteUser(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId, @PathVariable Long userId) {
+    public void deleteUser(@PathVariable Long userId) {
 
-        client.deleteUser(adminId, userId);
+        client.deleteUser(userId);
     }
 }

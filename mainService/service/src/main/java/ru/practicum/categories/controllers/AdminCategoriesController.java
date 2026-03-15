@@ -16,24 +16,21 @@ public class AdminCategoriesController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CategoryDto createCategory(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                      @RequestBody NewCategoryDto categoryDto) {
-        return categoriesService.createCategory(adminId, categoryDto);
+    public CategoryDto createCategory(@RequestBody NewCategoryDto categoryDto) {
+        return categoriesService.createCategory(categoryDto);
 
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{categoryId}")
-    public void deleteCategoryById(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                   @PathVariable Long categoryId) {
-        categoriesService.deleteCategoryById(adminId, categoryId);
+    public void deleteCategoryById(@PathVariable Long categoryId) {
+        categoriesService.deleteCategoryById(categoryId);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{categoryId}")
-    public CategoryDto updateCategory(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                      @PathVariable Long categoryId, @PathVariable NewCategoryDto categoryDto) {
-        return categoriesService.updateCategory(adminId, categoryId, categoryDto);
+    public CategoryDto updateCategory(@PathVariable Long categoryId, @RequestBody NewCategoryDto categoryDto) {
+        return categoriesService.updateCategory(categoryId, categoryDto);
     }
 
 

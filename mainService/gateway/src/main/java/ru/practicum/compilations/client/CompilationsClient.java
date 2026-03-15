@@ -7,8 +7,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
-
 import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
 import ru.practicum.exceptions.GatewayException;
@@ -24,10 +22,9 @@ public class CompilationsClient {
     @Value("${explore.main.server.url}")
     private String serverUrl;
 
-    public CompilationDto createCompilation(Long adminId,
-                                            NewCompilationDto dto) {
+    public CompilationDto createCompilation(NewCompilationDto dto) {
         String url = createUrl("/admin/compilations");
-        HttpEntity<NewCompilationDto> request = new HttpEntity<>(dto, createHeadersWithUserId(adminId));
+        HttpEntity<NewCompilationDto> request = new HttpEntity<>(dto);
         try {
             ResponseEntity<CompilationDto> response = restTemplate
                     .exchange(url, HttpMethod.POST, request, CompilationDto.class);
@@ -38,22 +35,19 @@ public class CompilationsClient {
         }
     }
 
-    public void deleteCompilation(Long adminId,
-                                  Long compId) {
+    public void deleteCompilation(Long compId) {
         String url = createUrl("/admin/compilations/" + compId);
-        HttpEntity<?> request = new HttpEntity<>(createHeadersWithUserId(adminId));
         try {
-            restTemplate.exchange(url, HttpMethod.DELETE, request, Void.class);
+            restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
         } catch (HttpStatusCodeException e) {
             throw new GatewayException((HttpStatus) e.getStatusCode(), e.getResponseBodyAsString());
         }
     }
 
-    public CompilationDto updateCompilation(Long adminId,
-                                            Long compId,
+    public CompilationDto updateCompilation(Long compId,
                                             NewCompilationDto dto) {
         String url = createUrl("/admin/compilations/" + compId);
-        HttpEntity<NewCompilationDto> request = new HttpEntity<>(dto, createHeadersWithUserId(adminId));
+        HttpEntity<NewCompilationDto> request = new HttpEntity<>(dto);
         try {
             ResponseEntity<CompilationDto> response = restTemplate
                     .exchange(url, HttpMethod.PATCH, request, CompilationDto.class);

@@ -16,10 +16,10 @@ public class RegisteredEventController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{userId}/events")
-    public List<EventShortDto> getUserEvents(@PathVariable Long userID,
+    public List<EventShortDto> getUserEvents(@PathVariable Long userId,
                                              @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "10") int size) {
-        return eventService.getUserEvents(userID, from, size);
+        return eventService.getUserEvents(userId, from, size);
     }
 
     @ResponseStatus(HttpStatus.CREATED)

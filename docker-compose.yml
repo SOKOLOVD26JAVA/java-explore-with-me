@@ -64,4 +64,4 @@ services:
       - ewm-service
       - stats-server
     environment:
-      - EXPLORE_MAIN_SERVER_URL=http://main-server:9091
+      - EXPLORE_MAIN_SERVER_URL=http://ewm-service:9091

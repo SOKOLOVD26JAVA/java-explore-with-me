@@ -3,7 +3,6 @@ package ru.practicum.compilations.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import ru.practicum.compilations.mapper.CompilationsMapper;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationsRepository;
@@ -26,9 +25,8 @@ public class CompilationService {
     private final EventsRepository eventsRepository;
     private final UserRepository userRepository;
 
-    public CompilationDto createCompilation(Long adminId, NewCompilationDto dto) {
+    public CompilationDto createCompilation(NewCompilationDto dto) {
 
-        adminCheck(adminId);
 
         Compilation compilation = CompilationsMapper.mapToCompilation(dto);
         if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
@@ -40,15 +38,14 @@ public class CompilationService {
         return CompilationsMapper.mapToCompilationDto(compilation);
     }
 
-    public void deleteCompilation(Long adminId, Long compId) {
-        adminCheck(adminId);
+    public void deleteCompilation(Long compId) {
         Compilation compilation = getCompilation(compId);
 
         compilationsRepository.delete(compilation);
     }
 
-    public CompilationDto updateCompilation(Long adminId, Long compId, NewCompilationDto dto) {
-        adminCheck(adminId);
+    public CompilationDto updateCompilation(Long compId, NewCompilationDto dto) {
+
         Compilation compilation = getCompilation(compId);
 
         if (dto.getPinned() != null) {

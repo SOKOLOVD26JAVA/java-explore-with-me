@@ -3,7 +3,6 @@ package ru.practicum.users.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.Headers;
 import ru.practicum.users.service.UsersService;
 import ru.practicum.usersDto.NewUserDto;
 import ru.practicum.usersDto.UserDto;
@@ -20,29 +19,27 @@ public class AdminUsersController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public UserDto createUser(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                              @RequestBody NewUserDto newUserDto) {
+    public UserDto createUser(@RequestBody NewUserDto newUserDto) {
 
-        return usersService.createUser(adminId, newUserDto);
+        return usersService.createUser(newUserDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<UserDto> getUsers(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId,
-                                  @RequestParam(required = false) List<Long> ids,
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
         if (ids == null || ids.isEmpty()) {
-            return usersService.findAll(adminId, from, size);
+            return usersService.findAll(from, size);
         } else {
-            return usersService.findByIds(adminId, ids);
+            return usersService.findByIds(ids);
         }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
-    public void deleteUser(@RequestHeader(value = Headers.SHARER_USER_ID, required = true) Long adminId, @PathVariable Long userId) {
+    public void deleteUser(@PathVariable Long userId) {
 
-        usersService.deleteUserById(adminId, userId);
+        usersService.deleteUserById(userId);
     }
 }

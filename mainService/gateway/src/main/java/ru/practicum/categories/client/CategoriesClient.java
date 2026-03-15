@@ -22,9 +22,9 @@ public class CategoriesClient {
     @Value("${explore.main.server.url}")
     private String serverUrl;
 
-    public CategoryDto createCategory(Long adminId, NewCategoryDto categoryDto) {
+    public CategoryDto createCategory(NewCategoryDto categoryDto) {
         String url = createUrl("/admin/categories");
-        HttpEntity<NewCategoryDto> request = new HttpEntity<>(categoryDto, createHeadersWithUserId(adminId));
+        HttpEntity<NewCategoryDto> request = new HttpEntity<>(categoryDto);
         try {
             ResponseEntity<CategoryDto> response = restTemplate
                     .exchange(url, HttpMethod.POST, request, CategoryDto.class);
@@ -35,19 +35,18 @@ public class CategoriesClient {
         }
     }
 
-    public void deleteCategoryById(Long adminId, Long catId) {
-        String url = createUrl("/admin/categories/" + catId);
-        HttpEntity<?> request = new HttpEntity<>(createHeadersWithUserId(adminId));
+    public void deleteCategoryById(Long catId) {
+        String url = createUrl("/admin/categories/" + catId);;
         try {
-            restTemplate.exchange(url, HttpMethod.DELETE, request, Void.class);
+            restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
         } catch (HttpStatusCodeException e) {
             throw new GatewayException((HttpStatus) e.getStatusCode(), e.getResponseBodyAsString());
         }
     }
 
-    public CategoryDto updateCategory(Long adminId, Long catId, NewCategoryDto categoryDto) {
+    public CategoryDto updateCategory(Long catId, NewCategoryDto categoryDto) {
         String url = createUrl("/admin/categories/" + catId);
-        HttpEntity<NewCategoryDto> request = new HttpEntity<>(categoryDto, createHeadersWithUserId(adminId));
+        HttpEntity<NewCategoryDto> request = new HttpEntity<>(categoryDto);
         try {
             ResponseEntity<CategoryDto> response = restTemplate
                     .exchange(url, HttpMethod.PATCH, request, CategoryDto.class);

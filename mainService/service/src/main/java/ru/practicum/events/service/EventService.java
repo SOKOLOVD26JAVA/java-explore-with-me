@@ -4,12 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
-
 import org.springframework.stereotype.Service;
-
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
-
 import ru.practicum.client.HitServerHttpClientImpl;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
@@ -81,8 +78,7 @@ public class EventService {
         return EventMapper.mapToFullEventDto(event, getViews(event), requestsRepository.getConfirmedRequestsCount(eventId));
     }
 
-    public EventFullDto updateEventByAdmin(Long adminId, Long eventId, UpdateEventAdminRequestDto request) {
-        adminCheck(adminId);
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequestDto request) {
         Event event = getEventById(eventId);
 
         if (request.getStateAction() == null) {
@@ -106,10 +102,10 @@ public class EventService {
         return updateEvent(event, request, request.getStateAction());
     }
 
-    public List<EventFullDto> getAllEventsAdmin(Long adminId, List<Long> ids, List<State> states, List<Long> categories,
+    public List<EventFullDto> getAllEventsAdmin(List<Long> ids, List<State> states, List<Long> categories,
                                                 LocalDateTime rangeStart, LocalDateTime rageEnd, int from, int size) {
 
-        adminCheck(adminId);
+
         List<EventWithConfirmed> events = eventsRepository.findAllEvents(ids, states, categories, rangeStart, rageEnd, PageRequest.of(from, size));
 
         return events.stream().map(row -> {

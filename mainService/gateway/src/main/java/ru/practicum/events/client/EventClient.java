@@ -27,8 +27,7 @@ public class EventClient {
     @Value("${explore.main.server.url}")
     private String serverUrl;
 
-    public List<EventFullDto> getAllEventsAdmin(Long adminId,
-                                                List<Long> ids,
+    public List<EventFullDto> getAllEventsAdmin(List<Long> ids,
                                                 List<State> states,
                                                 List<Long> categories,
                                                 LocalDateTime rangeStart,
@@ -79,10 +78,10 @@ public class EventClient {
             uri.append("?from=").append(from).append("&size=").append(size);
         }
         String fullUri = createUrl(uri.toString());
-        HttpEntity<?> request = new HttpEntity<>(createHeadersWithUserId(adminId));
+
         try {
             ResponseEntity<List<EventFullDto>> response = restTemplate
-                    .exchange(fullUri, HttpMethod.GET, request, new ParameterizedTypeReference<List<EventFullDto>>() {
+                    .exchange(fullUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<EventFullDto>>() {
                     });
             return response.getBody();
         } catch (HttpStatusCodeException e) {
@@ -90,11 +89,10 @@ public class EventClient {
         }
     }
 
-    public EventFullDto updateEventByAdmin(Long adminId,
-                                           Long eventId,
+    public EventFullDto updateEventByAdmin(Long eventId,
                                            UpdateEventAdminRequestDto dto) {
         String uri = createUrl("/admin/events/" + eventId);
-        HttpEntity<UpdateEventAdminRequestDto> request = new HttpEntity<>(dto, createHeadersWithUserId(adminId));
+        HttpEntity<UpdateEventAdminRequestDto> request = new HttpEntity<>(dto);
         try {
             ResponseEntity<EventFullDto> response = restTemplate
                     .exchange(uri, HttpMethod.PATCH, request, EventFullDto.class);
