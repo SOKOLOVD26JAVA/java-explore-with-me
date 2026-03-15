@@ -13,10 +13,7 @@ import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventWithConfirmed;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.eventsDto.*;
-import ru.practicum.exceptions.AccessException;
-import ru.practicum.exceptions.BadRequestException;
-import ru.practicum.exceptions.ConflictException;
-import ru.practicum.exceptions.NotFoundException;
+import ru.practicum.exceptions.*;
 import ru.practicum.hitDto.HitResponseDto;
 import ru.practicum.locationModel.mapper.LocationMapper;
 import ru.practicum.requests.repository.RequestsRepository;
@@ -174,6 +171,9 @@ public class EventService {
             event.setDescription(request.getDescription());
         }
         if (request.getEventDate() != null) {
+            if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+                throw new BadTimeException("Event date must be at least 2 hours from now");//Добавил проверку
+            }
             event.setEventDate(request.getEventDate());
         }
         if (request.getLocation() != null) {

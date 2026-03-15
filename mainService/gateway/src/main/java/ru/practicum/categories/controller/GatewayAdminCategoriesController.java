@@ -29,7 +29,7 @@ public class GatewayAdminCategoriesController {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{categoryId}")
-    public CategoryDto updateCategory(@PathVariable Long categoryId, @PathVariable NewCategoryDto categoryDto) {
+    public CategoryDto updateCategory(@PathVariable Long categoryId, @RequestBody NewCategoryDto categoryDto) {
         return client.updateCategory(categoryId, categoryDto);
     }
 }

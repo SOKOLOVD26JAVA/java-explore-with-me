@@ -41,7 +41,7 @@ public class GatewayRegisteredEventController {
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long userId,
                                     @PathVariable Long eventId,
-                                    @Valid @RequestBody UpdateEventUserRequestDto request) {
+                                    @RequestBody UpdateEventUserRequestDto request) {//убрал валидацию
         return client.updateEventByUser(userId, eventId, request);
     }
 

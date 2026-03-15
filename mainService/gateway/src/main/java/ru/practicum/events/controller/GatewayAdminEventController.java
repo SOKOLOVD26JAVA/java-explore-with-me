@@ -35,7 +35,7 @@ public class GatewayAdminEventController {
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
-                                           @Valid @RequestBody UpdateEventAdminRequestDto request) {
+                                           @RequestBody UpdateEventAdminRequestDto request) {
         return client.updateEventByAdmin(eventId, request);
     }
 }

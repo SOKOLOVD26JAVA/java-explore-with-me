@@ -55,5 +55,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(BadTimeException.class)
+    public ResponseEntity<ErrorResponse> badTimeException(BadTimeException exception) {
+        ErrorResponse error = ErrorResponse.builder().status("FORBIDDEN")
+                .reason("For the requested operation the conditions are not met")
+                .message(exception.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+
 
 }

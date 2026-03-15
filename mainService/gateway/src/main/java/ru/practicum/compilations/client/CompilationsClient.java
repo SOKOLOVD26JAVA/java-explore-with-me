@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompilationsClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${explore.main.server.url}")
     private String serverUrl;

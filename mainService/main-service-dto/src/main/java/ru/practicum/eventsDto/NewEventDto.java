@@ -2,6 +2,7 @@ package ru.practicum.eventsDto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class NewEventDto {
     @NotNull(message = "Field: paid. Error: must not be null.  Value: null")
     private Boolean paid;
     @NotNull(message = "Field: participant_limit. Error: must not be null.  Value: null")
+    @Min(value = 0, message = "Field: participant_limit. Error: must be greater than or equal to 0")//добавил валидацию
     private int participantLimit;
     @NotNull(message = "Field: request_moderation. Error: must not be null.  Value: null")
     private Boolean requestModeration;
