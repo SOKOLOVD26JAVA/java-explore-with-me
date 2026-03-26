@@ -1,7 +1,6 @@
 package ru.practicum.requests.controllers;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.requests.service.RequestService;
@@ -16,15 +15,15 @@ import java.util.List;
 public class RegisteredEventsRequestController {
     private final RequestService requestService;
 
-    @GetMapping("{userId}/events/{eventId}/requests")
+    @GetMapping("users/{userId}/events/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
     public List<ParticipantRequestDto> getUserRequests(@PathVariable Long userId,
                                                        @PathVariable Long eventId) {
         return requestService.getUserRequests(userId, eventId);
     }
 
-    @PatchMapping("{userId}/events/{eventId}/requests")
-    @ResponseStatus(HttpStatus.CREATED)
+    @PatchMapping("users/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult updateRequest(@PathVariable Long userId,
                                                         @PathVariable Long eventId,
                                                         @RequestBody EventRequestStatusUpdateRequest dto) {

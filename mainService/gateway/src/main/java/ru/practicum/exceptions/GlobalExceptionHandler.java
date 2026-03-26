@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,7 +23,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.builder()
                 .status("BAD_REQUEST")
                 .reason("Incorrectly made request.")
-                .message(exception.getMessage())
+                .message(er.getDefaultMessage())
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
@@ -32,17 +31,17 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> httpMessageNotReadableException(HttpMessageNotReadableException exception) {
-        ErrorResponse error = ErrorResponse.builder()
-                .status("BAD_REQUEST")
-                .reason("Incorrectly made request.")
-                .message("incorrect date format.")
-                .timestamp(LocalDateTime.now().toString())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ErrorResponse> httpMessageNotReadableException(HttpMessageNotReadableException exception) {
+//        ErrorResponse error = ErrorResponse.builder()
+//                .status("BAD_REQUEST")
+//                .reason("Incorrectly made request.")
+//                .message("incorrect date format.")
+//                .timestamp(LocalDateTime.now().toString())
+//                .build();
+//
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+//    }
 
 
     @ExceptionHandler(GatewayException.class)

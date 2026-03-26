@@ -1,5 +1,6 @@
 package ru.practicum.events.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -24,17 +25,17 @@ public class GatewayAdminEventController {
                                            @RequestParam(required = false) List<State> states,
                                            @RequestParam(required = false) List<Long> categories,
                                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rageEnd,
+                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                            @RequestParam(defaultValue = "0") int from,
                                            @RequestParam(defaultValue = "10") int size) {
-        return client.getAllEventsAdmin(users, states, categories, rangeStart, rageEnd, from, size);
+        return client.getAllEventsAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
-    //    Валидация по ТЗ не требуется
+
     @PatchMapping("/{eventId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
-                                           @RequestBody UpdateEventAdminRequestDto request) {
+                                           @Valid @RequestBody UpdateEventAdminRequestDto request) {
         return client.updateEventByAdmin(eventId, request);
     }
 }

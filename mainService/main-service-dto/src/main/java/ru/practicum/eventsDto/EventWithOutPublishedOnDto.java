@@ -1,5 +1,6 @@
 package ru.practicum.eventsDto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import ru.practicum.LocationDto;
 import ru.practicum.categoryDto.CategoryDto;
@@ -14,6 +15,7 @@ public class EventWithOutPublishedOnDto {
     private CategoryDto category;
     private Long confirmedRequest;
     private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private UserShortDto initiator;
     private LocationDto location;

@@ -3,8 +3,8 @@ package ru.practicum.requests.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.events.model.Event;
-import ru.practicum.users.model.User;
 import ru.practicum.requestsDto.EventRequestStatus;
+import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,7 @@ public class Request {
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "requester_id")
     private User requester;
 
     @EqualsAndHashCode.Exclude

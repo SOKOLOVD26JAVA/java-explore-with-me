@@ -2,9 +2,9 @@ package ru.practicum.events.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.categories.model.Category;
 import ru.practicum.eventsDto.State;
 import ru.practicum.locationModel.Location;
-import ru.practicum.categories.model.Category;
 import ru.practicum.requests.model.Request;
 import ru.practicum.users.model.User;
 
@@ -55,7 +55,7 @@ public class Event {
 
     @EqualsAndHashCode.Exclude
     @ToString.Include
-    private int participantLimit;
+    private Integer participantLimit;
 
     @EqualsAndHashCode.Exclude
     @ToString.Include

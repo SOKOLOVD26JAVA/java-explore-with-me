@@ -37,11 +37,11 @@ public class GatewayRegisteredEventController {
         return client.getUserEvent(userId, eventId);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long userId,
                                     @PathVariable Long eventId,
-                                    @RequestBody UpdateEventUserRequestDto request) {
+                                    @Valid @RequestBody UpdateEventUserRequestDto request) {
         return client.updateEventByUser(userId, eventId, request);
     }
 

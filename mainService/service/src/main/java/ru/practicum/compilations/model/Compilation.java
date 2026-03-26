@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.events.model.Event;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class Compilation {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @ManyToMany
-    @JoinTable(name = "compilation_events",
+    @JoinTable(name = "compilations_events",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
     private List<Event> events = new ArrayList<>();

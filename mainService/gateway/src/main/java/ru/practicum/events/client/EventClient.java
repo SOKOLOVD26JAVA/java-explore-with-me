@@ -1,28 +1,28 @@
 package ru.practicum.events.client;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.core.ParameterizedTypeReference;
-
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
 import ru.practicum.eventsDto.*;
 import ru.practicum.exceptions.GatewayException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class EventClient {
 
     private final RestTemplate restTemplate;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Value("${explore.main.server.url}")
     private String serverUrl;
@@ -60,16 +60,16 @@ public class EventClient {
         }
         if (rangeStart != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeStart=").append(rangeStart);
+                uri.append("&rangeStart=").append(rangeStart.format(formatter));
             } else {
-                uri.append("?rangeStart=").append(rangeStart);
+                uri.append("?rangeStart=").append(rangeStart.format(formatter));
             }
         }
         if (rageEnd != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeEnd=").append(rageEnd);
+                uri.append("&rangeEnd=").append(rageEnd.format(formatter));
             } else {
-                uri.append("?rangeEnd=").append(rageEnd);
+                uri.append("?rangeEnd=").append(rageEnd.format(formatter));
             }
         }
         if (uri.toString().contains("?")) {
@@ -78,6 +78,7 @@ public class EventClient {
             uri.append("?from=").append(from).append("&size=").append(size);
         }
         String fullUri = createUrl(uri.toString());
+        log.info(fullUri);
 
         try {
             ResponseEntity<List<EventFullDto>> response = restTemplate
@@ -137,16 +138,16 @@ public class EventClient {
         }
         if (rangeStart != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeStart=").append(rangeStart);
+                uri.append("&rangeStart=").append(rangeStart.format(formatter));
             } else {
-                uri.append("?rangeStart=").append(rangeStart);
+                uri.append("?rangeStart=").append(rangeStart.format(formatter));
             }
         }
         if (rageEnd != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeEnd=").append(rageEnd);
+                uri.append("&rangeEnd=").append(rageEnd.format(formatter));
             } else {
-                uri.append("?rangeEnd=").append(rageEnd);
+                uri.append("?rangeEnd=").append(rageEnd.format(formatter));
             }
         }
         if (onlyAvailable) {
@@ -170,6 +171,7 @@ public class EventClient {
         }
 
         String fullUri = createUrl(uri.toString());
+
         try {
             ResponseEntity<List<EventShortDto>> response = restTemplate
                     .exchange(fullUri, HttpMethod.GET, null, new ParameterizedTypeReference<List<EventShortDto>>() {

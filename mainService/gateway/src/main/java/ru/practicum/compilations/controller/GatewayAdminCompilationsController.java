@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.client.CompilationsClient;
 import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
+import ru.practicum.compilationsDto.UpdateCompilationDto;
 
 @RestController
 @RequestMapping("/admin/compilations")
@@ -28,8 +29,8 @@ public class GatewayAdminCompilationsController {
     }
 
     @PatchMapping("/{compId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto updateCompilation(@Valid @RequestBody NewCompilationDto dto,
+    @ResponseStatus(HttpStatus.OK)
+    public CompilationDto updateCompilation(@Valid @RequestBody UpdateCompilationDto dto,
                                             @PathVariable Long compId) {
         return client.updateCompilation(compId, dto);
     }

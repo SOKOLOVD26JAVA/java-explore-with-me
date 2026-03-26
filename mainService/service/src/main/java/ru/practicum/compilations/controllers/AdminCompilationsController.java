@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
+import ru.practicum.compilationsDto.UpdateCompilationDto;
 
 @RestController
 @RequestMapping("/admin/compilations")
@@ -28,7 +29,7 @@ public class AdminCompilationsController {
 
     @PatchMapping("/{compId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto updateCompilation(@RequestBody NewCompilationDto dto,
+    public CompilationDto updateCompilation(@RequestBody UpdateCompilationDto dto,
                                             @PathVariable Long compId) {
         return compilationService.updateCompilation(compId, dto);
     }

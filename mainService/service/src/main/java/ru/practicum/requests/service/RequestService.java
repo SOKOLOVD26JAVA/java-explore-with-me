@@ -2,8 +2,6 @@ package ru.practicum.requests.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.eventsDto.State;
@@ -54,7 +52,7 @@ public class RequestService {
             throw new AccessException("You have no access for this operation.");
         }
 
-        List<Request> requests = requestsRepository.findAllById(dto.getRequests());
+        List<Request> requests = requestsRepository.findAllById(dto.getRequestIds());
 
         checkRequestStatus(requests);
         checkConfirmedRequestLimitException(event);
@@ -68,13 +66,14 @@ public class RequestService {
                 } else {
                     Long count = requestsRepository.getConfirmedRequestsCount(eventId);
                     int limit = event.getParticipantLimit();
-
                     for (Request request : requests) {
                         if (limit > count) {
                             request.setStatus(EventRequestStatus.CONFIRMED);
+                            requestsRepository.save(request);
                             count++;
                         } else {
                             request.setStatus(EventRequestStatus.REJECTED);
+                            requestsRepository.save(request);
                         }
                     }
                     return RequestMapper.mapToRequestResult(requests);
@@ -83,6 +82,7 @@ public class RequestService {
             case REJECTED -> {
                 for (Request request : requests) {
                     request.setStatus(EventRequestStatus.REJECTED);
+                    requestsRepository.save(request);
                 }
                 return RequestMapper.mapToRequestResult(requests);
             }
@@ -98,21 +98,21 @@ public class RequestService {
     public ParticipantRequestDto createRequestEvent(Long userId, Long eventId) {
         Event event = getEventById(eventId);
         User user = getUserById(userId);
-        if (Objects.equals(event.getInitiator().getId(), userId)) {
+        if (event.getInitiator().getId().equals(userId)) {
             throw new ConflictException("Initiator cant create request.");
         }
         if (event.getState() != State.PUBLISHED) {
             throw new ConflictException("Event with ID = " + eventId + ", not found.");
         }
 
-        checkConfirmedRequestLimitException(event);
-
         for (Request request : event.getRequests()) {
             if (request.getRequester().equals(user)) {
                 throw new ConflictException("Your request has been existing");
             }
         }
-
+        if (event.getParticipantLimit() != 0) {
+            checkConfirmedRequestLimitException(event);
+        }
         Request request = new Request();
         request.setRequester(user);
         request.setEvent(event);
@@ -120,6 +120,7 @@ public class RequestService {
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(EventRequestStatus.CONFIRMED);
         } else {
+            checkConfirmedRequestLimitException(event);
             request.setStatus(EventRequestStatus.PENDING);
         }
 

@@ -1,6 +1,7 @@
 package ru.practicum.compilations.client;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -9,10 +10,12 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
+import ru.practicum.compilationsDto.UpdateCompilationDto;
 import ru.practicum.exceptions.GatewayException;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CompilationsClient {
@@ -45,9 +48,9 @@ public class CompilationsClient {
     }
 
     public CompilationDto updateCompilation(Long compId,
-                                            NewCompilationDto dto) {
+                                            UpdateCompilationDto dto) {
         String url = createUrl("/admin/compilations/" + compId);
-        HttpEntity<NewCompilationDto> request = new HttpEntity<>(dto);
+        HttpEntity<UpdateCompilationDto> request = new HttpEntity<>(dto);
         try {
             ResponseEntity<CompilationDto> response = restTemplate
                     .exchange(url, HttpMethod.PATCH, request, CompilationDto.class);
@@ -61,7 +64,15 @@ public class CompilationsClient {
     public List<CompilationDto> getAllCompilations(Boolean pinned,
                                                    int from,
                                                    int size) {
-        String url = createUrl("/compilations?pinned=" + pinned + "&from=" + from + "&size=" + size);
+        StringBuilder params = new StringBuilder();
+
+        if (pinned != null) {
+            params.append("/compilations?pinned=").append(pinned).append("&from=").append(from).append("&size=").append(size);
+        } else {
+            params.append("/compilations?from=").append(from).append("&size=").append(size);
+        }
+        String url = createUrl(params.toString());
+        log.info(url);
 
         try {
             ResponseEntity<List<CompilationDto>> response = restTemplate

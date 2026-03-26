@@ -61,12 +61,14 @@ public class EventMapper {
         dto.setPaid(event.getPaid());
         dto.setParticipantLimit(event.getParticipantLimit());
         dto.setRequestModeration(event.getRequestModeration());
+        dto.setPublishedOn(event.getPublishedOn());
+        dto.setCreatedOn(event.getCreatedOn());
         dto.setTitle(event.getTitle());
         dto.setState(event.getState());
         dto.setInitiator(UsersMapper.mapToUserShortDto(event.getInitiator()));
         dto.setCategory(CategoriesMapper.mapToCategoryDto(event.getCategory()));
         dto.setViews(views);
-        dto.setConfirmedRequest(confirmedRequests);
+        dto.setConfirmedRequests(confirmedRequests);
 
         return dto;
     }

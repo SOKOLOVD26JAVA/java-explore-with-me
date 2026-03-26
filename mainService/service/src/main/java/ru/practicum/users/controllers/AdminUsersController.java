@@ -1,5 +1,6 @@
 package ru.practicum.users.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class AdminUsersController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public UserDto createUser(@RequestBody NewUserDto newUserDto) {
+    public UserDto createUser(@Valid @RequestBody NewUserDto newUserDto) {
 
         return usersService.createUser(newUserDto);
     }

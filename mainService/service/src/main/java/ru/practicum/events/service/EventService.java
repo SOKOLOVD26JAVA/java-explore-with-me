@@ -2,6 +2,7 @@ package ru.practicum.events.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 import static ru.practicum.eventsDto.UserStateAction.CANCEL_REVIEW;
 import static ru.practicum.eventsDto.UserStateAction.SEND_TO_REVIEW;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -58,10 +61,19 @@ public class EventService {
         event.setInitiator(getUserById(userId));
         event.setCreatedOn(LocalDateTime.now());
         event.setState(State.PENDING);
+        if (eventDto.getPaid() == null) {
+            event.setPaid(false);
+        }
+        if (eventDto.getParticipantLimit() == null) {
+            event.setParticipantLimit(0);
+        }
+        if (eventDto.getRequestModeration() == null) {
+            event.setRequestModeration(true);
+        }
         try {
             return EventMapper.mapToEventWithOutPubDto(eventsRepository.save(event));
         } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("The event starts no earlier than 2 hours after publication");
+            throw new BadTimeException("The event starts no earlier than 2 hours after publication");
         }
     }
 
@@ -78,9 +90,6 @@ public class EventService {
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequestDto request) {
         Event event = getEventById(eventId);
 
-        if (request.getStateAction() == null) {
-            throw new AccessException("You need to choose 'state action' parameter.");
-        }
         return updateEvent(event, request, request.getStateAction());
     }
 
@@ -90,22 +99,49 @@ public class EventService {
             throw new AccessException("You have no access for this operation.");
         }
         if (event.getState() == State.PUBLISHED) {
-            throw new AccessException("You can't update this event");
+            throw new ConflictException("You can't update this event");
         }
-        if (request.getStateAction() == null) {
-            throw new AccessException("You need to choose 'state action' parameter.");
+        if (request.getParticipantLimit() != null && request.getParticipantLimit() < 0) {
+            throw new BadRequestException("Participant limit must be positive or zero");
         }
 
         return updateEvent(event, request, request.getStateAction());
     }
 
     public List<EventFullDto> getAllEventsAdmin(List<Long> ids, List<State> states, List<Long> categories,
-                                                LocalDateTime rangeStart, LocalDateTime rageEnd, int from, int size) {
+                                                LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
 
+        List<EventWithConfirmed> events = new ArrayList<>();
+        if (ids == null) {
+            ids = new ArrayList<>();
+        }
+        if (states == null) {
+            states = new ArrayList<>();
+        }
+        if (categories == null) {
+            categories = new ArrayList<>();
+        }
+        if (rangeStart == null && rangeEnd != null) {
+            events = eventsRepository.findEventsWithEndDate(ids, states, categories, rangeEnd, PageRequest.of(from, size));
+        }
 
-        List<EventWithConfirmed> events = eventsRepository.findAllEvents(ids, states, categories, rangeStart, rageEnd, PageRequest.of(from, size));
+        if (rangeEnd == null && rangeStart != null) {
+            events = eventsRepository.findEventsWithStartDate(ids, states, categories, rangeStart, PageRequest.of(from, size));
+        }
+
+        if (rangeStart == null && rangeEnd == null) {
+            events = eventsRepository.findEventsWithoutDates(ids, states, categories, PageRequest.of(from, size));
+        }
+        if (rangeStart != null && rangeEnd != null) {
+            events = eventsRepository.findAllEvents(ids, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size));
+        }
+
+        if (ids.isEmpty() && states.isEmpty() && categories.isEmpty() && rangeStart == null && rangeEnd == null) {
+            events = eventsRepository.findAllEvents(PageRequest.of(from, size));
+        }
 
         return events.stream().map(row -> {
+
             EventFullDto dto = EventMapper.mapToFullEventDto(row.getEvent(), getViews(row.getEvent()), row.getConfirmedRequests());
             return dto;
         }).collect(Collectors.toList());
@@ -134,6 +170,15 @@ public class EventService {
         if (rangeStart == null && rageEnd == null) {
             rangeStart = LocalDateTime.now();
         }
+
+        if (rageEnd != null && rageEnd.isBefore(rangeStart)) {
+            throw new BadRequestException("End date cannot be before start date");
+        }
+
+        if (catIds == null) {
+            catIds = new ArrayList<>();
+        }
+
         List<EventWithConfirmed> events = eventsRepository.findEventsPublic(text, catIds, paid, rangeStart, rageEnd, onlyAvailable, PageRequest.of(from, size));
 
 
@@ -172,9 +217,11 @@ public class EventService {
         }
         if (request.getEventDate() != null) {
             if (request.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-                throw new BadTimeException("Event date must be at least 2 hours from now");//Добавил проверку
+                throw new BadTimeException("Event date must be at least 2 hours from now");
             }
-            event.setEventDate(request.getEventDate());
+            if (stateAction != CANCEL_REVIEW) {
+                event.setEventDate(request.getEventDate());
+            }
         }
         if (request.getLocation() != null) {
             event.setLocation(LocationMapper.mapToLocation(request.getLocation()));
@@ -191,7 +238,6 @@ public class EventService {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());
         }
-
         if (stateAction instanceof UserStateAction) {
             switch (stateAction) {
                 case SEND_TO_REVIEW:
@@ -199,6 +245,7 @@ public class EventService {
                     break;
                 case CANCEL_REVIEW:
                     event.setState(State.CANCELED);
+
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stateAction);
@@ -208,16 +255,16 @@ public class EventService {
             switch (stateAction) {
                 case AdminStateAction.PUBLISH_EVENT:
                     if (event.getState() != State.PENDING) {
-                        throw new AccessException("You cant publish this event");
+                        throw new ConflictException("You cant publish this event");
                     }
                     event.setState(State.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
                     break;
                 case AdminStateAction.REJECT_EVENT:
                     if (event.getState() == State.PUBLISHED) {
-                        throw new AccessException("You cant reject this event");
+                        throw new ConflictException("You cant reject this event");
                     }
-                    event.setState(State.REJECTED);
+                    event.setState(State.CANCELED);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stateAction);

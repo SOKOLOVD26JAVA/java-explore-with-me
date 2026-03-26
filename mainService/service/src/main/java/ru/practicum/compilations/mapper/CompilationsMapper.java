@@ -5,6 +5,7 @@ import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
 import ru.practicum.events.mapper.EventMapper;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class CompilationsMapper {
@@ -26,6 +27,8 @@ public class CompilationsMapper {
         dto.setPinned(compilation.getPinned());
         if (compilation.getEvents() != null && !compilation.getEvents().isEmpty()) {
             dto.setEvents(compilation.getEvents().stream().map(EventMapper::mapToEventShortDto).collect(Collectors.toList()));
+        } else {
+            dto.setEvents(new ArrayList<>());
         }
 
         return dto;

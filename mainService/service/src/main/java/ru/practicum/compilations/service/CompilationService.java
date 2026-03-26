@@ -8,6 +8,7 @@ import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationsRepository;
 import ru.practicum.compilationsDto.CompilationDto;
 import ru.practicum.compilationsDto.NewCompilationDto;
+import ru.practicum.compilationsDto.UpdateCompilationDto;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exceptions.AccessException;
@@ -25,6 +26,7 @@ public class CompilationService {
     private final EventsRepository eventsRepository;
     private final UserRepository userRepository;
 
+
     public CompilationDto createCompilation(NewCompilationDto dto) {
 
 
@@ -33,18 +35,19 @@ public class CompilationService {
             List<Event> events = eventsRepository.findAllById(dto.getEvents());
             compilation.setEvents(events);
         }
-
+        if (dto.getPinned() == null) {
+            compilation.setPinned(false);
+        }
         compilationsRepository.save(compilation);
         return CompilationsMapper.mapToCompilationDto(compilation);
     }
 
     public void deleteCompilation(Long compId) {
         Compilation compilation = getCompilation(compId);
-
         compilationsRepository.delete(compilation);
     }
 
-    public CompilationDto updateCompilation(Long compId, NewCompilationDto dto) {
+    public CompilationDto updateCompilation(Long compId, UpdateCompilationDto dto) {
 
         Compilation compilation = getCompilation(compId);
 
@@ -65,7 +68,7 @@ public class CompilationService {
     public List<CompilationDto> getAllCompilations(Boolean pinned, int from, int size) {
         if (pinned != null) {
             return compilationsRepository.findByPinned(pinned, PageRequest.of(from, size))
-                    .stream().map(CompilationsMapper::mapToCompilationDto).collect(Collectors.toList());
+                    .stream().map(CompilationsMapper::mapToCompilationDto).toList();
         } else {
             return compilationsRepository.findAll(PageRequest.of(from, size)).stream()
                     .map(CompilationsMapper::mapToCompilationDto).collect(Collectors.toList());
@@ -87,5 +90,6 @@ public class CompilationService {
     private Compilation getCompilation(Long compId) {
         return compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException("Compilation with ID = " + compId + ", not found."));
     }
+
 
 }

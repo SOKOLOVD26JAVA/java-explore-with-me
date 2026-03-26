@@ -25,7 +25,7 @@ public class GatewayRegisteredEventsRequestController {
     }
 
     @PatchMapping("users/{userId}/events/{eventId}/requests")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public EventRequestStatusUpdateResult updateRequest(@PathVariable Long userId,
                                                         @PathVariable Long eventId,
                                                         @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
