@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class NewUserDto {
     @Email(message = "Field: email. Error: incorrect email format.")
-    @NotBlank(message = "Field: email. Error: must not be null. Value: null" )
+    @NotBlank(message = "Field: email. Error: must not be null. Value: null")
     @Size(min = 6, max = 254, message = "Field: email. Error: length must be between 2 and 250")
     private String email;
     @NotBlank(message = "Field: name. Error: must not be null. Value: null")
