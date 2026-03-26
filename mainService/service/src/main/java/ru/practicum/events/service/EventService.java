@@ -189,7 +189,7 @@ public class EventService {
             return dto;
         }).toList();
 
-        serverHttpClient.saveHit("ewm-main-service", "/events/", request.getRemoteAddr(), LocalDateTime.now());
+        serverHttpClient.saveHit("ewm-main-service", "/events", request.getRemoteAddr(), LocalDateTime.now());
 
         if (sort == null) {
             return shortDtoEvents;
