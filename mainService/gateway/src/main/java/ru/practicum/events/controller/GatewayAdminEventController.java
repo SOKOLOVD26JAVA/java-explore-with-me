@@ -2,15 +2,13 @@ package ru.practicum.events.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.events.client.EventClient;
 import ru.practicum.eventsDto.EventFullDto;
-import ru.practicum.eventsDto.State;
 import ru.practicum.eventsDto.UpdateEventAdminRequestDto;
+import ru.practicum.requestParams.AdminGetEventsParam;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,14 +19,8 @@ public class GatewayAdminEventController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventFullDto> getAllEvents(@RequestParam(required = false) List<Long> users,
-                                           @RequestParam(required = false) List<State> states,
-                                           @RequestParam(required = false) List<Long> categories,
-                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                           @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                           @RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
-        return client.getAllEventsAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
+    public List<EventFullDto> getAllEvents(@Valid AdminGetEventsParam getEventsParam) {
+        return client.getAllEventsAdmin(getEventsParam);
     }
 
 

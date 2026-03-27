@@ -17,6 +17,8 @@ import ru.practicum.eventsDto.*;
 import ru.practicum.exceptions.*;
 import ru.practicum.hitDto.HitResponseDto;
 import ru.practicum.locationModel.mapper.LocationMapper;
+import ru.practicum.requestParams.AdminGetEventsParam;
+import ru.practicum.requestParams.GetEventsParam;
 import ru.practicum.requests.repository.RequestsRepository;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.practicum.eventsDto.UserStateAction.CANCEL_REVIEW;
@@ -43,15 +46,31 @@ public class EventService {
 
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
 
-        getUserById(userId);
 
         List<EventWithConfirmed> events = eventsRepository.findAllByIdPageable(userId, PageRequest.of(from, size));
-        return events.stream().map(row -> {
-            EventShortDto dto = EventMapper.mapToEventShortDto(row.getEvent());
-            dto.setConfirmedRequests(row.getConfirmedRequests());
-            dto.setViews(getViews(row.getEvent()));
-            return dto;
-        }).collect(Collectors.toList());
+
+        LocalDateTime earliestStart = events.stream().filter(e -> e.getEvent().getState() == State.PUBLISHED)
+                .map(e -> e.getEvent().getPublishedOn())
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now().minusYears(100));
+
+        List<String> uris = events.stream()
+                .map(e -> "/events/" + e.getEvent().getId())
+                .collect(Collectors.toList());
+
+        List<HitResponseDto> stats = serverHttpClient.getStats(earliestStart, LocalDateTime.now(), uris, true);
+        Map<String, Long> viewsMap = stats.stream()
+                .collect(Collectors.toMap(HitResponseDto::getUri, HitResponseDto::getHits));
+
+
+        return events.stream()
+                .map(row -> {
+                    EventShortDto dto = EventMapper.mapToEventShortDto(row.getEvent());
+                    dto.setConfirmedRequests(row.getConfirmedRequests());
+                    dto.setViews(viewsMap.getOrDefault("/events/" + row.getEvent().getId(), 0L));
+                    return dto;
+                })
+                .collect(Collectors.toList());
 
     }
 
@@ -108,36 +127,35 @@ public class EventService {
         return updateEvent(event, request, request.getStateAction());
     }
 
-    public List<EventFullDto> getAllEventsAdmin(List<Long> ids, List<State> states, List<Long> categories,
-                                                LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
+    public List<EventFullDto> getAllEventsAdmin(AdminGetEventsParam param) {
 
         List<EventWithConfirmed> events = new ArrayList<>();
-        if (ids == null) {
-            ids = new ArrayList<>();
+        if (param.getUsers() == null) {
+            param.setUsers(new ArrayList<>());
         }
-        if (states == null) {
-            states = new ArrayList<>();
+        if (param.getStates() == null) {
+            param.setStates(new ArrayList<>());
         }
-        if (categories == null) {
-            categories = new ArrayList<>();
+        if (param.getCategories() == null) {
+            param.setCategories(new ArrayList<>());
         }
-        if (rangeStart == null && rangeEnd != null) {
-            events = eventsRepository.findEventsWithEndDate(ids, states, categories, rangeEnd, PageRequest.of(from, size));
-        }
-
-        if (rangeEnd == null && rangeStart != null) {
-            events = eventsRepository.findEventsWithStartDate(ids, states, categories, rangeStart, PageRequest.of(from, size));
+        if (param.getRangeStart() == null && param.getRangeEnd() != null) {
+            events = eventsRepository.findEventsWithEndDate(param.getUsers(), param.getStates(), param.getCategories(), param.getRangeEnd(), PageRequest.of(param.getFrom(), param.getSize()));
         }
 
-        if (rangeStart == null && rangeEnd == null) {
-            events = eventsRepository.findEventsWithoutDates(ids, states, categories, PageRequest.of(from, size));
-        }
-        if (rangeStart != null && rangeEnd != null) {
-            events = eventsRepository.findAllEvents(ids, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size));
+        if (param.getRangeEnd() == null && param.getRangeStart() != null) {
+            events = eventsRepository.findEventsWithStartDate(param.getUsers(), param.getStates(), param.getCategories(), param.getRangeStart(), PageRequest.of(param.getFrom(), param.getSize()));
         }
 
-        if (ids.isEmpty() && states.isEmpty() && categories.isEmpty() && rangeStart == null && rangeEnd == null) {
-            events = eventsRepository.findAllEvents(PageRequest.of(from, size));
+        if (param.getRangeStart() == null && param.getRangeEnd() == null) {
+            events = eventsRepository.findEventsWithoutDates(param.getUsers(), param.getStates(), param.getCategories(), PageRequest.of(param.getFrom(), param.getSize()));
+        }
+        if (param.getRangeStart() != null && param.getRangeEnd() != null) {
+            events = eventsRepository.findAllEvents(param.getUsers(), param.getStates(), param.getCategories(), param.getRangeStart(), param.getRangeEnd(), PageRequest.of(param.getFrom(), param.getSize()));
+        }
+
+        if (param.getUsers().isEmpty() && param.getStates().isEmpty() && param.getCategories().isEmpty() && param.getRangeStart() == null && param.getRangeEnd() == null) {
+            events = eventsRepository.findAllEvents(PageRequest.of(param.getFrom(), param.getSize()));
         }
 
         return events.stream().map(row -> {
@@ -152,49 +170,59 @@ public class EventService {
         if (event.getState() != State.PUBLISHED) {
             throw new NotFoundException("Event with ID = " + eventId + ", not found.");
         }
-        serverHttpClient.saveHit("ewm-main-service", "/events/" + eventId, request.getRemoteAddr(), LocalDateTime.now());
+        serverHttpClient.saveHit("/events/" + eventId, request.getRemoteAddr(), LocalDateTime.now());
         return EventMapper.mapToFullEventDto(event, getViews(event), requestsRepository.getConfirmedRequestsCount(eventId));
     }
 
-    public List<EventShortDto> getEvents(String text,
-                                         List<Long> catIds,
-                                         Boolean paid,
-                                         LocalDateTime rangeStart,
-                                         LocalDateTime rageEnd,
-                                         Boolean onlyAvailable,
-                                         String sort,
-                                         int from,
-                                         int size,
+    public List<EventShortDto> getEvents(GetEventsParam param,
                                          HttpServletRequest request
     ) {
-        if (rangeStart == null && rageEnd == null) {
-            rangeStart = LocalDateTime.now();
+        if (param.getRangeStart() == null && param.getRangeEnd() == null) {
+            param.setRangeStart(LocalDateTime.now());
         }
 
-        if (rageEnd != null && rageEnd.isBefore(rangeStart)) {
+        if (param.getRangeEnd() != null && param.getRangeEnd().isBefore(param.getRangeStart())) {
             throw new BadRequestException("End date cannot be before start date");
         }
 
-        if (catIds == null) {
-            catIds = new ArrayList<>();
+        if (param.getCategories() == null) {
+            param.setCategories(new ArrayList<>());
         }
 
-        List<EventWithConfirmed> events = eventsRepository.findEventsPublic(text, catIds, paid, rangeStart, rageEnd, onlyAvailable, PageRequest.of(from, size));
+        List<EventWithConfirmed> events = eventsRepository.findEventsPublic(param.getText(),
+                param.getCategories(), param.getPaid(), param.getRangeStart(), param.getRangeEnd(), param.getOnlyAvailable(), PageRequest.of(param.getFrom(), param.getSize()));
 
 
-        List<EventShortDto> shortDtoEvents = events.stream().map(row -> {
-            EventShortDto dto = EventMapper.mapToEventShortDto(row.getEvent());
-            dto.setConfirmedRequests(row.getConfirmedRequests());
-            dto.setViews(getViews(row.getEvent()));
-            return dto;
-        }).toList();
+        LocalDateTime earliestStart = events.stream().filter(e -> e.getEvent().getState() == State.PUBLISHED)
+                .map(e -> e.getEvent().getPublishedOn())
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now().minusYears(100));
 
-        serverHttpClient.saveHit("ewm-main-service", "/events", request.getRemoteAddr(), LocalDateTime.now());
+        List<String> uris = events.stream()
+                .map(e -> "/events/" + e.getEvent().getId())
+                .collect(Collectors.toList());
 
-        if (sort == null) {
+
+        List<HitResponseDto> stats = serverHttpClient.getStats(earliestStart, LocalDateTime.now(), uris, true);
+        Map<String, Long> viewsMap = stats.stream()
+                .collect(Collectors.toMap(HitResponseDto::getUri, HitResponseDto::getHits));
+
+
+        List<EventShortDto> shortDtoEvents = events.stream()
+                .map(row -> {
+                    EventShortDto dto = EventMapper.mapToEventShortDto(row.getEvent());
+                    dto.setConfirmedRequests(row.getConfirmedRequests());
+                    dto.setViews(viewsMap.getOrDefault("/events/" + row.getEvent().getId(), 0L));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        serverHttpClient.saveHit("/events", request.getRemoteAddr(), LocalDateTime.now());
+
+        if (param.getSort() == null) {
             return shortDtoEvents;
         }
-        return switch (sort) {
+        return switch (param.getSort()) {
             case "EVENT_DATE" ->
                     shortDtoEvents.stream().sorted(Comparator.comparing(EventShortDto::getEventDate).reversed()).collect(Collectors.toList());
             case "VIEWS" ->
@@ -294,14 +322,6 @@ public class EventService {
         return serverHttpClient
                 .getStats(event.getCreatedOn(), LocalDateTime.now(), List.of("/events/" + event.getId()), true)
                 .stream().findFirst().map(HitResponseDto::getHits).orElse(0L);
-    }
-
-    private void adminCheck(Long adminId) {
-        User admin = userRepository.findById(adminId).orElseThrow(() -> new NotFoundException("Admin with ID = " + adminId + ", not found."));
-
-        if (!admin.getIsAdmin()) {
-            throw new AccessException("You have no access for this operation.");
-        }
     }
 
 }

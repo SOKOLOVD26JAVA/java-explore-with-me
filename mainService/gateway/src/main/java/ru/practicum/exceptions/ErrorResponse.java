@@ -18,8 +18,6 @@ public class ErrorResponse {
     String message;
     String reason;
     String status;
-
-
     String timestamp;
 
 

@@ -41,6 +41,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=explore
       - SPRING_DATASOURCE_PASSWORD=explore
       - explore.server.url=http://stats-server:9090
+      - explore.app.name=ewm-main-service
   main-db:
     image: postgres:16.1
     container_name: main-service-db

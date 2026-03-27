@@ -4,14 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.eventsDto.*;
 import ru.practicum.exceptions.GatewayException;
+import ru.practicum.requestParams.AdminGetEventsParam;
+import ru.practicum.requestParams.GetEventsParam;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,55 +31,49 @@ public class EventClient {
     @Value("${explore.main.server.url}")
     private String serverUrl;
 
-    public List<EventFullDto> getAllEventsAdmin(List<Long> ids,
-                                                List<State> states,
-                                                List<Long> categories,
-                                                LocalDateTime rangeStart,
-                                                LocalDateTime rageEnd,
-                                                int from,
-                                                int size) {
+    public List<EventFullDto> getAllEventsAdmin(AdminGetEventsParam param) {
         String baseUri = "/admin/events";
         StringBuilder uri = new StringBuilder();
         uri.append(baseUri);
 
-        if (ids != null && !ids.isEmpty()) {
-            String strIds = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (param.getUsers() != null && !param.getUsers().isEmpty()) {
+            String strIds = param.getUsers().stream().map(String::valueOf).collect(Collectors.joining(","));
             uri.append("?users=").append(strIds);
         }
-        if (states != null && !states.isEmpty()) {
-            String strStates = states.stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (param.getStates() != null && !param.getStates().isEmpty()) {
+            String strStates = param.getStates().stream().map(String::valueOf).collect(Collectors.joining(","));
             if (uri.toString().contains("?")) {
                 uri.append("&states=").append(strStates);
             } else {
                 uri.append("?states=").append(strStates);
             }
         }
-        if (categories != null && !categories.isEmpty()) {
-            String strCategories = categories.stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (param.getCategories() != null && !param.getCategories().isEmpty()) {
+            String strCategories = param.getCategories().stream().map(String::valueOf).collect(Collectors.joining(","));
             if (uri.toString().contains("?")) {
                 uri.append("&categories=").append(strCategories);
             } else {
                 uri.append("?categories=").append(strCategories);
             }
         }
-        if (rangeStart != null) {
+        if (param.getRangeStart() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeStart=").append(rangeStart.format(formatter));
+                uri.append("&rangeStart=").append(param.getRangeStart().format(formatter));
             } else {
-                uri.append("?rangeStart=").append(rangeStart.format(formatter));
+                uri.append("?rangeStart=").append(param.getRangeStart().format(formatter));
             }
         }
-        if (rageEnd != null) {
+        if (param.getRangeEnd() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeEnd=").append(rageEnd.format(formatter));
+                uri.append("&rangeEnd=").append(param.getRangeEnd().format(formatter));
             } else {
-                uri.append("?rangeEnd=").append(rageEnd.format(formatter));
+                uri.append("?rangeEnd=").append(param.getRangeEnd().format(formatter));
             }
         }
         if (uri.toString().contains("?")) {
-            uri.append("&from=").append(from).append("&size=").append(size);
+            uri.append("&from=").append(param.getFrom()).append("&size=").append(param.getSize());
         } else {
-            uri.append("?from=").append(from).append("&size=").append(size);
+            uri.append("?from=").append(param.getFrom()).append("&size=").append(param.getSize());
         }
         String fullUri = createUrl(uri.toString());
         log.info(fullUri);
@@ -104,70 +102,61 @@ public class EventClient {
 
     }
 
-    public List<EventShortDto> getEvents(String text,
-                                         List<Long> catIds,
-                                         Boolean paid,
-                                         LocalDateTime rangeStart,
-                                         LocalDateTime rageEnd,
-                                         Boolean onlyAvailable,
-                                         String sort,
-                                         int from,
-                                         int size
-    ) {
+    public List<EventShortDto> getEvents(GetEventsParam param) {
         String baseUri = "/events";
         StringBuilder uri = new StringBuilder();
         uri.append(baseUri);
 
-        if (text != null) {
-            uri.append("?text=").append(text);
+        if (param.getText() != null) {
+            uri.append("?text=").append(param.getText());
         }
-        if (catIds != null && !catIds.isEmpty()) {
-            String strStates = catIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        if (param.getCategories() != null && !param.getCategories().isEmpty()) {
+            String strStates = param.getCategories().stream().map(String::valueOf).collect(Collectors.joining(","));
             if (uri.toString().contains("?")) {
                 uri.append("&categories=").append(strStates);
             } else {
                 uri.append("?categories=").append(strStates);
             }
         }
-        if (paid != null) {
+        if (param.getPaid() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&paid=").append(paid);
+                uri.append("&paid=").append(param.getPaid());
             } else {
-                uri.append("?paid=").append(paid);
+                uri.append("?paid=").append(param.getPaid());
             }
         }
-        if (rangeStart != null) {
+        if (param.getRangeStart() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeStart=").append(rangeStart.format(formatter));
+                uri.append("&rangeStart=").append(param.getRangeStart().format(formatter));
             } else {
-                uri.append("?rangeStart=").append(rangeStart.format(formatter));
+                uri.append("?rangeStart=").append(param.getRangeStart().format(formatter));
             }
         }
-        if (rageEnd != null) {
+        if (param.getRangeEnd() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&rangeEnd=").append(rageEnd.format(formatter));
+                uri.append("&rangeEnd=").append(param.getRangeEnd().format(formatter));
             } else {
-                uri.append("?rangeEnd=").append(rageEnd.format(formatter));
+                uri.append("?rangeEnd=").append(param.getRangeEnd().format(formatter));
             }
         }
-        if (onlyAvailable) {
+        if (param.getOnlyAvailable()) {
             if (uri.toString().contains("?")) {
-                uri.append("&onlyAvailable=").append(onlyAvailable);
+                uri.append("&onlyAvailable=").append(param.getOnlyAvailable());
             } else {
-                uri.append("?onlyAvailable=").append(onlyAvailable);
+                uri.append("?onlyAvailable=").append(param.getOnlyAvailable());
             }
         }
-        if (sort != null) {
+        if (param.getSort() != null) {
             if (uri.toString().contains("?")) {
-                uri.append("&sort=").append(sort);
+                uri.append("&sort=").append(param.getSort());
             } else {
-                uri.append("?sort=").append(sort);
+                uri.append("?sort=").append(param.getSort());
             }
         }
         if (uri.toString().contains("?")) {
-            uri.append("&from=").append(from).append("&size=").append(size);
+            uri.append("&from=").append(param.getFrom()).append("&size=").append(param.getSize());
         } else {
-            uri.append("?from=").append(from).append("&size=").append(size);
+            uri.append("?from=").append(param.getFrom()).append("&size=").append(param.getSize());
         }
 
         String fullUri = createUrl(uri.toString());
@@ -242,20 +231,6 @@ public class EventClient {
         } catch (HttpStatusCodeException e) {
             throw new GatewayException((HttpStatus) e.getStatusCode(), e.getResponseBodyAsString());
         }
-    }
-
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.ALL));
-
-        return headers;
-    }
-
-    private HttpHeaders createHeadersWithUserId(Long userId) {
-        HttpHeaders headers = createHeaders();
-        headers.set("X-Sharer-User-Id", userId.toString());
-        return headers;
     }
 
     private String createUrl(String path) {

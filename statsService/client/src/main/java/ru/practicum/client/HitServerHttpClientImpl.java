@@ -28,14 +28,17 @@ public class HitServerHttpClientImpl implements HitServerHttpClient {
 
     @Value("${explore.server.url}")
     private final String serverUrl;
+    @Value("${explore.app.name}")
+    private final String app;
 
-    public HitServerHttpClientImpl(@Value("${explore.server.url}") String serverUrl) {
+    public HitServerHttpClientImpl(@Value("${explore.server.url}") String serverUrl, @Value("${explore.app.name}") String app) {
         this.restTemplate = new RestTemplate();
         this.formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.serverUrl = serverUrl;
+        this.app = app;
     }
 
-    public HitDto saveHit(String app, String uri, String ip, LocalDateTime timestamp) {
+    public HitDto saveHit(String uri, String ip, LocalDateTime timestamp) {
         HitDto hitDto = new HitDto();
         hitDto.setApp(app);
         hitDto.setUri(uri);

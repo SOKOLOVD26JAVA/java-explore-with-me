@@ -3,7 +3,10 @@ package ru.practicum.categories.client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +39,8 @@ public class CategoriesClient {
     }
 
     public void deleteCategoryById(Long catId) {
-        String url = createUrl("/admin/categories/" + catId);;
+        String url = createUrl("/admin/categories/" + catId);
+        ;
         try {
             restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
         } catch (HttpStatusCodeException e) {
@@ -80,20 +84,6 @@ public class CategoriesClient {
         } catch (HttpStatusCodeException e) {
             throw new GatewayException((HttpStatus) e.getStatusCode(), e.getResponseBodyAsString());
         }
-    }
-
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.ALL));
-
-        return headers;
-    }
-
-    private HttpHeaders createHeadersWithUserId(Long userId) {
-        HttpHeaders headers = createHeaders();
-        headers.set("X-Sharer-User-Id", userId.toString());
-        return headers;
     }
 
     private String createUrl(String path) {
