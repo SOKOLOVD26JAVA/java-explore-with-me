@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HitServerHttpClient {
 
-    HitDto saveHit(String app, String uri, String ip, LocalDateTime timestamp);
+    HitDto saveHit(String uri, String ip, LocalDateTime timestamp);
 
     List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
 }

@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.exceptions.BadRequestException;
 import ru.practicum.hitDto.HitDto;
 import ru.practicum.hitDto.HitResponseDto;
 import ru.practicum.mapper.HitMapper;
@@ -21,6 +22,11 @@ public class StatsServerService {
     }
 
     public List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+
+        if (start.isAfter(end)) {
+            throw new BadRequestException("Start date cannot be after end date");
+        }
+
         if (uris == null || uris.isEmpty()) {
             if (unique) {
                 return repository.getWithOutUriUniqueStats(start, end);

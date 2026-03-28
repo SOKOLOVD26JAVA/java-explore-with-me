@@ -1,36 +1,44 @@
 package ru.practicum.client;
 
-import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.hitDto.HitDto;
 import ru.practicum.hitDto.HitResponseDto;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class HitServerHttpClientImpl implements HitServerHttpClient {
 
     private final RestTemplate restTemplate;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter;
 
     @Value("${explore.server.url}")
-    private String serverUrl;
+    private final String serverUrl;
+    @Value("${explore.app.name}")
+    private final String app;
 
-    public HitDto saveHit(String app, String uri, String ip, LocalDateTime timestamp) {
+    public HitServerHttpClientImpl(@Value("${explore.server.url}") String serverUrl, @Value("${explore.app.name}") String app) {
+        this.restTemplate = new RestTemplate();
+        this.formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.serverUrl = serverUrl;
+        this.app = app;
+    }
+
+    public HitDto saveHit(String uri, String ip, LocalDateTime timestamp) {
         HitDto hitDto = new HitDto();
         hitDto.setApp(app);
         hitDto.setUri(uri);
@@ -51,31 +59,27 @@ public class HitServerHttpClientImpl implements HitServerHttpClient {
     }
 
     public List<HitResponseDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        String encodedStart = URLEncoder.encode(
-                start.format(formatter),
-                StandardCharsets.UTF_8);
-        String encodedEnd = URLEncoder.encode(
-                end.format(formatter),
-                StandardCharsets.UTF_8);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                .queryParam("start", start.format(formatter))
+                .queryParam("end", end.format(formatter));
 
-        StringBuilder uriBuilder = new StringBuilder(serverUrl + "/stats?");
-
-        uriBuilder.append("start=").append(encodedStart).append("&end=").append(encodedEnd);
 
         if (uris != null && !uris.isEmpty()) {
-            uriBuilder.append("&uris=").append(String.join(",", uris));
+            uriBuilder.queryParam("uris", String.join(",", uris));
         }
 
         if (unique != null && unique) {
-            uriBuilder.append("&unique=true");
+            uriBuilder.queryParam("unique", true);
         }
 
-        String url = uriBuilder.toString();
+        String url = uriBuilder.build().toUriString();
 
         try {
-            ResponseEntity<HitResponseDto[]> response = restTemplate.getForEntity(
-                    url, HitResponseDto[].class);
-            return Arrays.asList(response.getBody());
+            log.info(url);
+            ResponseEntity<List<HitResponseDto>> response = restTemplate
+                    .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<HitResponseDto>>() {
+                    });
+            return response.getBody();
         } catch (HttpStatusCodeException e) {
             throw new RuntimeException("Ошибка получения хитов.");
         }

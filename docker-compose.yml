@@ -4,13 +4,14 @@ services:
     image: explore-with-me-server
     container_name: explore-with-me-server
     ports:
-      - "9090:8080"
+      - "9090:9090"
     depends_on:
       - stats-db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/explore-stats
       - SPRING_DATASOURCE_USERNAME=explore
       - SPRING_DATASOURCE_PASSWORD=explore
+      - explore.server.url=http://stats-server:9090
 
   stats-db:
     image: postgres:16.1
@@ -26,3 +27,44 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  ewm-service:
+    build: ./mainService/service
+    image: explore-with-me-main-service
+    container_name: explore-with-me-main-service
+    ports:
+      - "9091:9091"
+    depends_on:
+      - main-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-service-db
+      - SPRING_DATASOURCE_USERNAME=explore
+      - SPRING_DATASOURCE_PASSWORD=explore
+      - explore.server.url=http://stats-server:9090
+      - explore.app.name=ewm-main-service
+  main-db:
+    image: postgres:16.1
+    container_name: main-service-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=explore
+      - POSTGRES_USER=explore
+      - POSTGRES_DB=main-service-db
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  gateway:
+    build: ./mainService/gateway
+    image: explore-with-me-gateway
+    container_name: explore-with-me-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ewm-service
+      - stats-server
+    environment:
+      - explore.main.server.url=http://ewm-service:9091

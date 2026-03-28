@@ -10,4 +10,10 @@
     </parent>
 
     <artifactId>explore-with-me-main-service</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>gateway</module>
+        <module>service</module>
+        <module>main-service-dto</module>
+    </modules>
 </project>
