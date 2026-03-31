@@ -64,6 +64,7 @@ public class LikeService {
         Like like = getLikeById(likeId);
 
         if (!Objects.equals(like.getLiker().getId(), liker.getId())) {
+
             throw new AccessException("You cant update this like");
         }
 
