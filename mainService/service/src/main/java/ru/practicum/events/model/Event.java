@@ -3,6 +3,7 @@ package ru.practicum.events.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.categories.model.Category;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.eventsDto.State;
 import ru.practicum.locationModel.Location;
 import ru.practicum.requests.model.Request;
@@ -82,4 +83,10 @@ public class Event {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Request> requests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "event")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<Comment> comments = new ArrayList<>();
+
 }

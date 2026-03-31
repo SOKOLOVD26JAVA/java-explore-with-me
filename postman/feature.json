@@ -1,0 +1,805 @@
+{
+  "info": {
+    "_postman_id": "7b3f56e9-2da8-4188-8f04-488b852e4acd",
+    "name": "Explore With Me - Comments & Likes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46967567",
+    "_collection_link": "https://go.postman.co/collection/46967567-7b3f56e9-2da8-4188-8f04-488b852e4acd?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Private Comments",
+      "item": [
+        {
+          "name": "Create Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('id');",
+                  "    pm.expect(data).to.have.property('text');",
+                  "    pm.environment.set(\"commentId\", data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Отличное событие!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/events/{{eventId}}/users/{{userId}}/comments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "users",
+                "{{userId}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Comment text updated\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.text).to.eql('Обновлённый комментарий');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Обновлённый комментарий\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/events/{{eventId}}/users/{{userId}}/comments/{{commentId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "users",
+                "{{userId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Comments by Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events/users/{{userId}}/event/{{eventId}}/comments?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events",
+                "users",
+                "{{userId}}",
+                "event",
+                "{{eventId}}",
+                "comments"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Comments",
+      "item": [
+        {
+          "name": "Get All Comments by Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comments/{{eventId}}/all?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "comments",
+                "{{eventId}}",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Comments by Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comments/{{eventId}}/search?text=отличное&from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "comments",
+                "{{eventId}}",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "text",
+                  "value": "отличное"
+                },
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Comments",
+      "item": [
+        {
+          "name": "Get All Comments by User (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{userId}}?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment by Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.environment.set(\"oldCommentId\", pm.environment.get(\"commentId\"));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/{{adminId}}/comments/{{commentId}}?reason=spam",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "{{adminId}}",
+                "comments",
+                "{{commentId}}"
+              ],
+              "query": [
+                {
+                  "key": "reason",
+                  "value": "spam"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deleted Comment by Old ID (before return)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deleted comment has correct old ID\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('oldCommentId');",
+                  "    pm.expect(data.oldCommentId).to.eql(parseInt(pm.environment.get(\"oldCommentId\")));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/deleted/{{oldCommentId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "deleted",
+                "{{oldCommentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deleted Comments List (before return)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array and contains deleted comment\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "    const deletedExists = data.some(item => item.oldCommentId == pm.environment.get(\"oldCommentId\"));",
+                  "    pm.expect(deletedExists).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/deleted?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "deleted"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restore Comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array and contains restored comment\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "    if (data.length > 0) {",
+                  "        pm.environment.set(\"commentId\", data[0].id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/return?ids={{oldCommentId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "return"
+              ],
+              "query": [
+                {
+                  "key": "ids",
+                  "value": "{{oldCommentId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deleted Comments List (after return - should be empty for this comment)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deleted comment no longer in list\", function () {",
+                  "    const data = pm.response.json();",
+                  "    const deletedExists = data.some(item => item.oldCommentId == pm.environment.get(\"oldCommentId\"));",
+                  "    pm.expect(deletedExists).to.be.false;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/deleted?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "deleted"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Private Likes",
+      "item": [
+        {
+          "name": "Add Like",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.have.property('id');",
+                  "    pm.expect(data).to.have.property('rating');",
+                  "    pm.environment.set(\"likeId\", data.id);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rating\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{anotherUserID}}/comments/{{commentId}}/like",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{anotherUserID}}",
+                "comments",
+                "{{commentId}}",
+                "like"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Like",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Rating updated\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.rating).to.eql(3);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rating\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{anotherUserID}}/comments/{{commentId}}/like/{{likeId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{anotherUserID}}",
+                "comments",
+                "{{commentId}}",
+                "like",
+                "{{likeId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Like",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{anotherUserID}}/comments/{{commentId}}/like/{{likeId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{anotherUserID}}",
+                "comments",
+                "{{commentId}}",
+                "like",
+                "{{likeId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Likes",
+      "item": [
+        {
+          "name": "Get Comment Likes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is array\", function () {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/{{commentId}}/like?from=0&size=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "{{commentId}}",
+                "like"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "adminId",
+      "value": "8"
+    },
+    {
+      "key": "eventId",
+      "value": "2"
+    },
+    {
+      "key": "commentId",
+      "value": ""
+    },
+    {
+      "key": "likeId",
+      "value": ""
+    },
+    {
+      "key": "oldCommentId",
+      "value": ""
+    },
+    {
+      "key": "anotherUserID",
+      "value": "9"
+    }
+  ]
+}

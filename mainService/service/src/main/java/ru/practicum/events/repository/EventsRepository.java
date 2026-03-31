@@ -101,6 +101,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
             "LEFT JOIN Request r ON r.event.id = e.id AND r.status = 'CONFIRMED' " +
             "GROUP BY e")
     List<EventWithConfirmed> findAllEvents(Pageable pageable);
+
 }
 
 
