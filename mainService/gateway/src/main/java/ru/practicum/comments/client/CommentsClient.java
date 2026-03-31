@@ -178,7 +178,7 @@ public class CommentsClient {
     }
 
     public List<CommentResponseDto> getUserComments(Long userId, Long eventId, int from, int size) {
-        String url = createUrl("/events/" + eventId + "/users/" + userId + "/comments?from=" + from + "&size=" + size);
+        String url = createUrl("/events/users/" + userId + "/event/" + eventId + "/comments?from=" + from + "&size=" + size);
         try {
             ResponseEntity<List<CommentResponseDto>> response = restTemplate.exchange(
                     url, HttpMethod.GET, null, new ParameterizedTypeReference<List<CommentResponseDto>>() {
