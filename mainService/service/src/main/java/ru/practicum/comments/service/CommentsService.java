@@ -27,6 +27,7 @@ import ru.practicum.users.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +60,7 @@ public class CommentsService {
         Event event = getEventById(eventId);
         User author = getUserById(userId);
 
-        if (comment.getAuthor().getId() != author.getId()) {
+        if (!Objects.equals(comment.getAuthor().getId(), author.getId())) {
             throw new AccessException("You cant update this comment");
         }
 
@@ -73,7 +74,7 @@ public class CommentsService {
         Event event = getEventById(eventId);
         User author = getUserById(userId);
 
-        if (comment.getAuthor().getId() != author.getId()) {
+        if (!Objects.equals(comment.getAuthor().getId(), author.getId())) {
             throw new AccessException("You cant delete this comment");
         }
 

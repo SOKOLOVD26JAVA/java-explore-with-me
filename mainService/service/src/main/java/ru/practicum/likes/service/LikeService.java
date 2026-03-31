@@ -17,6 +17,7 @@ import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,7 @@ public class LikeService {
         User liker = getUserById(userId);
         Comment comment = getCommentById(commentId);
 
-        if (comment.getAuthor().getId() == liker.getId()) {
+        if (Objects.equals(comment.getAuthor().getId(), liker.getId())) {
             throw new AccessException("You cant like your own comment");
         }
 
@@ -62,7 +63,7 @@ public class LikeService {
         Comment comment = getCommentById(commentId);
         Like like = getLikeById(likeId);
 
-        if (like.getLiker().getId() != liker.getId()) {
+        if (!Objects.equals(like.getLiker().getId(), liker.getId())) {
             throw new AccessException("You cant update this like");
         }
 
@@ -80,7 +81,7 @@ public class LikeService {
         Comment comment = getCommentById(commentId);
         Like like = getLikeById(likeId);
 
-        if (like.getLiker().getId() != liker.getId()) {
+        if (!Objects.equals(like.getLiker().getId(), liker.getId())) {
             throw new AccessException("You cant delete this like");
         }
 
