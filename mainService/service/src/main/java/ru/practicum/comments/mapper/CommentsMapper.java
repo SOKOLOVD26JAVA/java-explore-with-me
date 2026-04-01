@@ -20,6 +20,15 @@ public class CommentsMapper {
         dto.setAuthorId(comment.getAuthor().getId());
         dto.setEventId(comment.getEvent().getId());
         dto.setCreated(comment.getCreated());
+        if (comment.getDeletedAt() != null) {
+            dto.setDeletedAt(comment.getDeletedAt());
+        }
+        if (comment.getDeletedBy() != null) {
+            dto.setDeletedBy(comment.getDeletedBy().getId());
+        }
+        if (comment.getReason() != null) {
+            dto.setReason(comment.getReason());
+        }
 
         return dto;
     }

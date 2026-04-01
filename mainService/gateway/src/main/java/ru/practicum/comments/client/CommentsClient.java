@@ -12,7 +12,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.commentDto.CommentRequestDto;
 import ru.practicum.commentDto.CommentResponseDto;
-import ru.practicum.commentDto.DeletedCommentDto;
 import ru.practicum.exceptions.GatewayException;
 import ru.practicum.likeDto.LikeResponseDto;
 
@@ -70,13 +69,13 @@ public class CommentsClient {
         }
     }
 
-    public List<DeletedCommentDto> getDeletedComments(int from,
-                                                      int size) {
+    public List<CommentResponseDto> getDeletedComments(int from,
+                                                       int size) {
         String url = createUrl("/admin/deleted?from=" + from + "&size=" + size);
 
         try {
-            ResponseEntity<List<DeletedCommentDto>> response = restTemplate
-                    .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<DeletedCommentDto>>() {
+            ResponseEntity<List<CommentResponseDto>> response = restTemplate
+                    .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<CommentResponseDto>>() {
                     });
             return response.getBody();
         } catch (HttpStatusCodeException e) {
@@ -84,12 +83,12 @@ public class CommentsClient {
         }
     }
 
-    public DeletedCommentDto getDeletedCommentByOldId(Long oldId) {
-        String url = createUrl("/admin/deleted/" + oldId);
+    public CommentResponseDto getDeletedCommentById(Long id) {
+        String url = createUrl("/admin/deleted/" + id);
 
         try {
-            ResponseEntity<DeletedCommentDto> response = restTemplate
-                    .exchange(url, HttpMethod.GET, null, DeletedCommentDto.class);
+            ResponseEntity<CommentResponseDto> response = restTemplate
+                    .exchange(url, HttpMethod.GET, null, CommentResponseDto.class);
 
             return response.getBody();
         } catch (HttpStatusCodeException e) {

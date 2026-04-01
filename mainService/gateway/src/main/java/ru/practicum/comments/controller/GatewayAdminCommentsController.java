@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.commentDto.CommentResponseDto;
-import ru.practicum.commentDto.DeletedCommentDto;
 import ru.practicum.comments.client.CommentsClient;
 import ru.practicum.likeDto.LikeResponseDto;
 
@@ -43,15 +42,15 @@ public class GatewayAdminCommentsController {
 
     @GetMapping("/deleted")
     @ResponseStatus(HttpStatus.OK)
-    public List<DeletedCommentDto> getDeletedComments(@RequestParam(defaultValue = "0") int from,
-                                                      @RequestParam(defaultValue = "10") int size) {
+    public List<CommentResponseDto> getDeletedComments(@RequestParam(defaultValue = "0") int from,
+                                                       @RequestParam(defaultValue = "10") int size) {
         return client.getDeletedComments(from, size);
     }
 
     @GetMapping("/deleted/{oldId}")
     @ResponseStatus(HttpStatus.OK)
-    public DeletedCommentDto getDeletedCommentByOldId(@PathVariable Long oldId) {
-        return client.getDeletedCommentByOldId(oldId);
+    public CommentResponseDto getDeletedCommentById(@PathVariable Long oldId) {
+        return client.getDeletedCommentById(oldId);
     }
 
     @PostMapping("/return")

@@ -1,19 +1,14 @@
 package ru.practicum.comments.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.commentDto.CommentRequestDto;
 import ru.practicum.commentDto.CommentResponseDto;
-import ru.practicum.commentDto.DeletedCommentDto;
 import ru.practicum.comments.mapper.CommentsMapper;
-import ru.practicum.comments.mapper.DeletedCommentsMapper;
 import ru.practicum.comments.model.Comment;
 import ru.practicum.comments.model.CommentWithRating;
-import ru.practicum.comments.model.DeletedComment;
 import ru.practicum.comments.repository.CommentsRepository;
-import ru.practicum.comments.repository.DeletedCommentsRepository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.eventsDto.State;
@@ -37,7 +32,7 @@ public class CommentsService {
     private final EventsRepository eventsRepository;
     private final UserRepository userRepository;
     private final CommentsRepository commentsRepository;
-    private final DeletedCommentsRepository deletedCommentsRepository;
+
 
     public CommentResponseDto createComment(CommentRequestDto dto, Long eventId, Long userId) {
 
@@ -155,31 +150,24 @@ public class CommentsService {
         Comment comment = getCommentById(commentId);
         User admin = getUserById(adminId);
 
-        DeletedComment deletedComment = new DeletedComment();
-        deletedComment.setDeletedAt(LocalDateTime.now());
-        deletedComment.setText(comment.getText());
-        deletedComment.setOldCommentId(comment.getId());
-        deletedComment.setAuthor(comment.getAuthor());
-        deletedComment.setEvent(comment.getEvent());
-        deletedComment.setAdmin(admin);
-        deletedComment.setReason(reason);
-        deletedComment.setCreated(comment.getCreated());
+        comment.setDeletedAt(LocalDateTime.now());
+        comment.setDeletedBy(admin);
+        comment.setReason(reason);
 
-        deletedCommentsRepository.save(deletedComment);
-        commentsRepository.delete(comment);
+        commentsRepository.save(comment);
     }
 
-    public List<DeletedCommentDto> getDeletedComments(int from,
-                                                      int size) {
-        Page<DeletedComment> deletedComments = deletedCommentsRepository.findAll(PageRequest.of(from, size));
+    public List<CommentResponseDto> getDeletedComments(int from,
+                                                       int size) {
+        List<Comment> deletedComments = commentsRepository.getDeletedComments(PageRequest.of(from, size));
 
-        return deletedComments.stream().map(DeletedCommentsMapper::mapToDeletedCommentDto)
-                .sorted(Comparator.comparing(DeletedCommentDto::getDeletedAt).reversed()).collect(Collectors.toList());
+        return deletedComments.stream().map(CommentsMapper::mapToCommentResponseDto)
+                .sorted(Comparator.comparing(CommentResponseDto::getDeletedAt).reversed()).collect(Collectors.toList());
     }
 
-    public DeletedCommentDto getDeletedCommentByOldId(Long oldCommentId) {
-        DeletedComment deletedComment = deletedCommentsRepository.getCommentByOldId(oldCommentId).orElseThrow(() -> new NotFoundException("Old comment with ID = " + oldCommentId + ", not found."));
-        return DeletedCommentsMapper.mapToDeletedCommentDto(deletedComment);
+    public CommentResponseDto getDeletedCommentById(Long oldCommentId) {
+        Comment comment = commentsRepository.getDeletedCommentById(oldCommentId).orElseThrow(() -> new NotFoundException("Old comment with ID = " + oldCommentId + ", not found."));
+        return CommentsMapper.mapToCommentResponseDto(comment);
     }
 
     public List<CommentResponseDto> returnDeletedComments(List<Long> ids) {
@@ -187,16 +175,20 @@ public class CommentsService {
             throw new BadTimeException("Choose comments for return");
         }
 
-        List<DeletedComment> deletedComments = deletedCommentsRepository.findCommentsByIds(ids);
+        List<Comment> deletedComments = commentsRepository.findDeletedCommentsByIds(ids);
         if (deletedComments.isEmpty()) {
             throw new BadRequestException("Deleted comments not found.");
         }
-        List<Comment> comments = deletedComments.stream().map(DeletedCommentsMapper::mapToCommentFromDeletedComment).collect(Collectors.toList());
 
-        commentsRepository.saveAll(comments);
-        deletedCommentsRepository.deleteAll(deletedComments);
+        for (Comment comment : deletedComments) {
+            comment.setDeletedBy(null);
+            comment.setDeletedAt(null);
+            comment.setReason(null);
+        }
 
-        return comments.stream().map(CommentsMapper::mapToCommentResponseDto).collect(Collectors.toList());
+        commentsRepository.saveAll(deletedComments);
+
+        return deletedComments.stream().map(CommentsMapper::mapToCommentResponseDto).collect(Collectors.toList());
     }
 
 
@@ -211,7 +203,7 @@ public class CommentsService {
     }
 
     private Comment getCommentById(Long commentId) {
-        return commentsRepository.findById(commentId)
+        return commentsRepository.getCommentById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment with ID = " + commentId + ", not found."));
     }
 

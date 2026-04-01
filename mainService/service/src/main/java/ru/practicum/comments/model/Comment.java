@@ -43,6 +43,21 @@ public class Comment {
     @ToString.Include
     private LocalDateTime created;
 
+    @ManyToOne
+    @JoinColumn(name = "deleted_by")
+    @EqualsAndHashCode.Exclude
+    @ToString.Include
+    private User deletedBy;
+
+    @Column(name = "deleted_at")
+    @EqualsAndHashCode.Exclude
+    @ToString.Include
+    private LocalDateTime deletedAt;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Include
+    private String reason;
+
     @OneToMany(mappedBy = "comment")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

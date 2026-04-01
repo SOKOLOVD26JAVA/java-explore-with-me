@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "7b3f56e9-2da8-4188-8f04-488b852e4acd",
+    "_postman_id": "c7c06f6f-92cb-4398-8c9c-80906f3d47a5",
     "name": "Explore With Me - Comments & Likes",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "46967567",
-    "_collection_link": "https://go.postman.co/collection/46967567-7b3f56e9-2da8-4188-8f04-488b852e4acd?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/46967567-c7c06f6f-92cb-4398-8c9c-80906f3d47a5?source=collection_link"
   },
   "item": [
     {
@@ -356,7 +356,7 @@
           "response": []
         },
         {
-          "name": "Get Deleted Comment by Old ID (before return)",
+          "name": "Get Deleted Comment by ID (before return)",
           "event": [
             {
               "listen": "test",
@@ -366,12 +366,21 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Deleted comment has correct old ID\", function () {",
+                  "pm.test(\"Deleted comment has correct ID\", function () {",
                   "    const data = pm.response.json();",
-                  "    pm.expect(data).to.have.property('oldCommentId');",
-                  "    pm.expect(data.oldCommentId).to.eql(parseInt(pm.environment.get(\"oldCommentId\")));",
+                  "    pm.expect(data).to.have.property('id');",
+                  "    pm.expect(data.id).to.eql(parseInt(pm.environment.get(\"commentId\")));",
                   "});"
                 ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "packages": {},
                 "type": "text/javascript"
               }
             }
@@ -407,11 +416,13 @@
                   "pm.test(\"Response is array and contains deleted comment\", function () {",
                   "    const data = pm.response.json();",
                   "    pm.expect(data).to.be.an('array');",
-                  "    const deletedExists = data.some(item => item.oldCommentId == pm.environment.get(\"oldCommentId\"));",
+                  "    const deletedExists = data.some(item => item.id == pm.environment.get(\"commentId\"));",
                   "    pm.expect(deletedExists).to.be.true;",
                   "});"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
