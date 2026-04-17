@@ -2,6 +2,7 @@ package ru.practicum.users.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.comments.model.Comment;
 import ru.practicum.events.model.Event;
 import ru.practicum.requests.model.Request;
 
@@ -45,5 +46,10 @@ public class User {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Request> requests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<Comment> comments = new ArrayList<>();
 
 }

@@ -40,7 +40,7 @@ public class CategoriesClient {
 
     public void deleteCategoryById(Long catId) {
         String url = createUrl("/admin/categories/" + catId);
-        ;
+
         try {
             restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
         } catch (HttpStatusCodeException e) {
